@@ -1,9 +1,9 @@
 from toml import load
 import os
 
-month = 7
+month = 8
 
-editor_in_chief = ["Qing Gu, Undergraduate, 2018", "Hongxu Zhou, Undergraduate, 2019"]
+editor_in_chief = ["Xuyao Fan, Undergraduate, 2021", "Jiaying Lu, Undergraduate, 2021"]
 
 editors = []
 
