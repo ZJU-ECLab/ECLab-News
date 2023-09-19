@@ -1,0 +1,67 @@
+[editor]
+name = "Xuyao Fan" # 格式类似于Shuoan Li
+degree = "Undergraduate, 2021" # 格式类似于Undergraduate, 2022
+
+[article.1] # 罗马数字指定文献编号
+title = "Seeing red: Distraction influences visual attention for anger but not for other negative emotions"
+doi = "https://doi.org/10.1037/emo0001136" # 以https://doi.org/开头
+authors = "Rutherford, Ashleigh V. Raila, Hannah Blicher, Andreas Vanderlind, W. Michael Joormann, Jutta"
+journal = "Emotion"
+publish = "23(5), 1224–1235" # 如发发布年份，期号，卷号，页码
+category = "Emotion" # Emotion, Face, Cross-culture等，注意首字母大写
+summary = "分心和认知重新评估是两种有效的情绪调节策略。研究者对参与者进行眼动追踪发现与重新评估和自然观看相比，分心条件下的参与者针对愤怒的材料表现出更短的停留时间。" # 中文的概括
+abstract = "Emotion regulation is a vital skill that improves psychological well-being and overall functioning.
+Distraction (the purposeful internal disengagement from an emotional stimulus) and cognitive reappraisal (the process of changing one’s thoughts about an emotional event/stimulus) are two well-established regulation strategies that can effectively decrease negative affect.
+Less understood, however, are the attention allocation strategies that occur when engaging in these emotion regulation strategies—specifically, do people visually scan emotional information differently when distracting vs. reappraising?
+In the current study, community participants were randomly assigned to either distract, reappraise, or view naturally while watching four emotional film clips that each elicited a different negative emotional state: anger, fear, sadness, and disgust.
+Eye tracking was used to record total time spent gazing (“dwell time”) at faces within the emotion-eliciting film clips.
+An effect of condition was found for anger-eliciting material only: participants in the distraction condition exhibited shorter dwell times compared with reappraisal and natural viewing.
+Importantly, this effect was moderated by state anxiety, such that it was found at low but not high levels of state anxiety.
+These results show that emotion regulation strategies differentially affect attention to emotion-eliciting stimuli and points to the role of current affective states in impacting how distraction is used. "
+keywords = "Emotion regulation strategies, Distraction, Anger" # 用英文逗号分隔
+
+[article.2] # 罗马数字指定文献编号
+title = "Facial expression of pain: Sex differences in the discrimination of varying intensities"
+doi = "https://doi.org/10.1037/emo0001156" # 以https://doi.org/开头
+authors = "Plouffe-Demers, Marie-Pier Saumure, Camille Fiset, Daniel Cormier, Stéphanie Blais, Caroline"
+journal = "Emotion"
+publish = "23(5), 1254–1266" # 如发发布年份，期号，卷号，页码
+category = "Face" # Emotion, Face, Cross-culture等，注意首字母大写
+summary = "本研究通过比较男性和女性用于区分不同强度的疼痛面部表情的视觉信息，发现女性依赖于更大的面部区域，从而选择更全面或更灵活的面部信息处理，而男性则会依赖特定但严格的整合策略。" # 中文的概括
+abstract = "It has been proposed that women are better than men at recognizing emotions and pain experienced by others. They have also been shown to be more sensitive to variations in pain expressions.
+The objective of the present study was to explore the perceptual basis of these sexual differences by comparing the visual information used by men and women to discriminate between different intensities of pain facial expressions.
+Using the data-driven Bubbles method, we were able to corroborate the woman advantage in the discrimination of pain intensities that did not appear to be explained by variations in empathic tendencies.
+In terms of visual strategies, our results do not indicate any qualitative differences in the facial regions used by men and women. However, they suggest that women rely on larger regions of the face that seems to completely mediate their advantage.
+This utilization of larger clusters could indicate either that women integrate simultaneously and more efficiently information coming from different areas of the face or that they are more flexible in the utilization of the information present in these clusters.
+Women would then opt for a more holistic or flexible processing of the facial information, while men would rely on a specific yet rigid integration strategy. "
+keywords = "Face, Visual strategies, Pain, Gender differences" # 用英文逗号分隔
+
+[article.3] # 罗马数字指定文献编号
+title = "Cross-cultural similarity and cultural specificity in the emotion perception from touch"
+doi = "https://doi.org/10.1037/emo0001086" # 以https://doi.org/开头
+authors = "Rika Oya, Akihiro Tanaka"
+journal = "Emotion"
+publish = "23(5), 1400–1409" # 如发发布年份，期号，卷号，页码
+category = "Cross-culture" # Emotion, Face, Cross-culture等，注意首字母大写
+summary = "研究者测试日本参与者对触摸的情绪感知，发现愤怒、爱与感激的情绪感知高于机遇水平，表明日本人和美国人在通过触摸感知情绪方面存在跨文化的相似性和差异性。" # 中文的概括
+abstract = "Can people communicate distinct emotions by touch? Previous studies in the United States have indicated that certain emotions could be perceived above the chance level when an encoder conveys emotions by touching a decoder's arm.
+However, the perception of emotions from touch has not been investigated in Japan, where it is uncommon to use touch as a method of daily communication.
+Therefore, we conducted an experiment with Japanese participants, which was nearly identical to previous studies with non-Japanese people.
+Results indicated that anger, love, and gratitude were categorized above chance, and fear, disgust, surprise, envy, and sympathy could also be accurately recognized above chance at a less detailed level such as pleasant or unpleasant, and aroused or nonaroused.
+These findings suggest cross-cultural similarities and differences between Japanese and American regarding the perception of emotions by touch."
+keywords = "Emotion, Perception, Touch, Cultural differences" # 用英文逗号分隔
+
+[article.4] # 罗马数字指定文献编号
+title = "I know you so I will regulate you: Closeness but not target’s emotion type affects all stages of extrinsic emotion regulation"
+doi = "https://doi.org/10.1037/emo0001073" # 以https://doi.org/开头
+authors = "Tanna, Victoria J. MacCann, Carolyn"
+journal = "Emotion"
+publish = "23(5), 1501–1505" # 如发发布年份，期号，卷号，页码
+category = "Emotion" # Emotion, Face, Cross-culture等，注意首字母大写
+summary = "本研究将情绪调节的扩展过程模型应用于外在调节（调节他人的情绪），发现亲密而非情绪类型会影响情绪调节扩展过程模型所有3个阶段的情绪调节。" # 中文的概括
+abstract = "The Extended Process model of Emotion Regulation outlines the processes people use to influence the timing and type of emotions they have. The current study applies this model to extrinsic regulation (regulating others’ emotions).
+In a 2x2 between-subjects design, we examine how the target person’s emotion (anger/anxiety), and target/regulator closeness (close/distant) interact to predict the regulator’s intention to regulate, regulation process choice, evaluation of regulation success (regulation self-efficacy), and empathy toward the target.
+Participants (N = 266) were randomly allocated to 1 of 4 conditions to read 3 vignettes where a close/distant target expressed anger/anxiety.
+Compared to distant targets, close targets elicited significantly greater intention to regulate, social sharing (but not humor, reappraisal, or distancing), self-efficacy of implementation and empathy. There was no support for emotion type or emotion-by-closeness hypotheses.
+We conclude that closeness but not emotion type affects emotion regulation at all 3 stages of the Extended Process model of Emotion Regulation. Future research could include the effect of closeness on additional processes (such as direct situation modification, or giving space)."
+keywords = "Emotion regulation, Closeness, The Extended Process model of Emotion Regulation" # 用英文逗号分隔
