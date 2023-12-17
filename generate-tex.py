@@ -2,9 +2,9 @@ from toml import load
 from proces import full_angle_to_half_angle
 import os
 
-month = 8
+month = 11
 
-editor_in_chief = ["Xuyao Fan, Undergraduate, 2021", "Jiaying Lu, Undergraduate, 2021"]
+editor_in_chief = ["Xintong Xie, Undergraduate, 2020", "Jingyi Yang, Undergraduate, 2022"]
 
 editors = []
 
