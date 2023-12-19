@@ -1,0 +1,37 @@
+[editor]
+name = "Zhuoyun Wu"
+degree = "Undergraduate, 2021"
+
+[article.1]
+title = "The Associations and Mediators Between Visual Disabilities and Anxiety
+Disorders in Middle-Aged and Older Adults: A Population-Based Study"
+doi = "https://doi.org/10.1037/amp0001143"
+authors = "Xiayin Zhang, Shan Wang, Zijing Du, Ishith Seth, Yaxin Wang, Yingying Liang, Guanrong Wu, Yu Huang, Shunming Liu, Yunyan Hu, Xianwen Shang, Yijun Hu, Zhuoting Zhu, and Honghua Yu"
+journal = "American Psychologist"
+publish = "2023, Vol. 78, No. 8, 982–994"
+category = "Emotion"
+summary = "该研究通过对英国生物库的数据进行分析，发现视力障碍与焦虑症之间存在显著关联。每差一行的视力与罹患住院焦虑症、终身焦虑症和当前焦虑症状增加有关。眼部疾病也与焦虑症有关，其中白内障是主要的中介因素之一。因此，早期干预包括治疗视力障碍和心理咨询服务，尤其是针对社会经济地位的敏感服务，可能有助于预防视力不佳者的焦虑症。"
+abstract = "Visual disabilities significantly impact an individual’s mental health. Little is known about the prospective relationship between visual disabilities and anxiety disorders and the underlying effects of modifiable risk factors. Our analysis was based on 117,252 participants from the U.K. Biobank, with baseline data collected between 2006 and 2010. Habitual visual acuity was measured by a standardized logarithmic chart, and ocular disorders reported using questionnaires were collected at baseline. Incident hospitalized anxiety recorded using longitudinal linkage with hospital inpatient data, lifetime anxiety disorder, and current anxiety symptoms assessed by a comprehensive online mental health questionnaire were identified over a 10-year follow-up. After adjustments for confounding factors, one-line worse visual acuity (0.1 logarithm of the minimum angle of resolution [logMAR]) was associated with an increased risk of incident hospitalized anxiety (HR = 1.05, 95% CI = 1.01–1.08), lifetime anxiety disorder (OR = 1.07, 95% CI [1.01–1.12]), and current anxiety scores (β = 0.028, 95% CI [0.002–0.054]). Besides poorer visual acuity, the longitudinal analysis also supported that each ocular disorder (including cataracts, glaucoma, macular degeneration, and diabetes-related eye disease) was significantly associated with at least two anxiety outcomes. Mediation analyses highlighted that subsequent onsets of eye diseases, especially cataracts, and lower socioeconomic status (SES) partly mediated the association between poorer visual acuity and anxiety disorders. This study demonstrates an overall association between visual disabilities and anxiety disorders in middle-aged and older adults. In particular, early interventions involving treatments for visual disabilities and effective psychological counseling services sensitive to socioeconomic status may help prevent anxiety in those living with poor vision."
+keywords = "visual acuity, age-related ocular disorders, anxiety, mediation analysis"
+
+[article.2]
+title = "Compassion Fatigue as a Self-Fulfilling Prophecy: Believing Compassion Is Limited Increases Fatigue and Decreases Compassion"
+doi = "https://doi.org/10.1177/09567976231194537"
+authors = "Izzy Gainsburg and Julia Lee Cunningham"
+journal = "Psychological Science"
+publish = "22 Sept. 2023, Vol. 34(11) 1206–1219"
+category = "Emotion"
+summary = "这项研究探讨了为什么人们在面对他人的苦难时很难持续感受到同情心，提出了有限同情心态的概念，即将同情心视为有限资源和一种疲惫的体验。研究发现，人们的同情心态存在变异性，这种心态可以通过有力的信息改变，并且有限同情心态预测较低的同情心感受、较低质量的社会支持和更多的疲劳感。"
+abstract = "People’s compassion responses often weaken with repeated exposure to suffering, a phenomenon known as compassion fatigue. Why is it so difficult to continue feeling compassion in response to others’ suffering? We propose that people’s limited-compassion mindsets—beliefs about compassion as a limited resource and a fatiguing experience—can result in a self-fulfilling prophecy that reinforces compassion fatigue. Across four studies of adults sampled from university students and online participant pools in the United States, we show that there is variability in people’s compassion mindsets, that these mindsets can be changed with convincing information, and that limited-compassion mindsets predict lower feelings of compassion, lower-quality social support, and more fatigue. This contributes to our understanding of factors that underlie compassion fatigue and supports the broader idea that people’s beliefs about the nature of emotions affect how emotions are experienced. Together, this research contributes to developing a strategy for increasing people’s capacity to feel compassion and their social support."
+keywords = "compassion, compassion fatigue, social support, mindsets"
+
+[article.3]
+title = "Knowledge About the Source of Emotion Predicts Emotion-Regulation Attempts, Strategies, and Perceived Emotion-Regulation Success"
+doi = "https://doi.org/10.1177/09567976231199440"
+authors = "Yael Millgram, Matthew K. Nock, David D. Bailey, and Amit Goldenberg"
+journal = "Psychological Science"
+publish = "Volume 34, Issue 11, November 2023, Pages 1244-1255"
+category = "Emotion"
+summary = "研究发现，人们对负面情绪源头的认知程度对情绪调节能力有重要影响。对源头知识的较高认知与更具体的描述、更多的情绪调节尝试、使用针对源头的调节策略以及更好的情绪调节成功感和幸福感之间存在关联。"
+abstract = "People’s ability to regulate emotions is crucial to healthy emotional functioning. One overlooked aspect in emotion-regulation research is that knowledge about the source of emotions can vary across situations and individuals, which could impact people’s ability to regulate emotion. Using ecological momentary assessments (N = 396; 7 days; 5,466 observations), we measured adults’ degree of knowledge about the source of their negative emotions. We used language processing to show that higher reported knowledge led to more concrete written descriptions of the source. We found that higher knowledge of the source predicted more emotion-regulation attempts; increased the use of emotion-regulation strategies that target the source (cognitive reappraisal, situation modification) versus strategies that do not (distraction, emotional eating); predicted greater perceived success in regulating emotions; and greater well-being. These patterns were evident both within and between persons. Our findings suggest that pinpointing the source of emotions might play an important role in emotion regulation."
+keywords = "emotion regulation, knowledge, source attribution, ecological momentary assessment, open data, open materials, preregistered"
