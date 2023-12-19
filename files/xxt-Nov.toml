@@ -1,0 +1,25 @@
+[editor]
+name = "Xintong Xie" # 格式类似于Shuoan Li
+degree = "Undergraduate, 2020" # 格式类似于Undergraduate, 2022
+
+[article.1] # 罗马数字指定文献编号
+title = "On the Invalidity of Neta and Kim's Argument That Surprise is Always Valenced"
+doi = "https://doi.org/10.1177/17540739231214785" # 以https://doi.org/开头
+authors = "Andrew Ortony,James A. Russell"
+journal = "Emotion Review"
+publish = "16 November 2023" # 如发发布年份，期号，卷号，页码
+category = "Emotion" # Emotion, Face, Cross-culture等，注意首字母大写
+summary = "作者Ortony在本文中反驳了Neta和Kim“惊讶是有效价的”观点，提出惊讶不一定有效价的，因此可以说不是一种情绪。作者认为Neta和Kim的立场是基于词语用法的特殊约定，并指出他们论证的逻辑错误。" # 中文的概括
+abstract = "In a challenge to Basic Emotion theories, Ortony suggested in a recent article that the existence of affect-free surprise means that surprise is not necessarily valenced and therefore arguably not an emotion. In an article in response, Neta and Kim argued that surprise is always valenced and therefore is an emotion, with apparent cases of affect-free surprise actually being cases of the cognitive state of unexpectedness rather than surprise. We view Neta and Kim's position as resting on an idiosyncratic stipulation of word usage. We further suggest that rejecting affect-free surprise by appealing to examples of affect-laden surprise has no bearing on whether surprise is always valenced, and propose that when surprise appears to be affect-laden the locus of the experienced valence is a co-occurring emotion."
+keywords = "surprise, affect-free surprise, unexpectedness, emotion, valence" # 用英文逗号分隔
+
+[article.2]
+title = "Collective emotion: a framework for experimental research"
+doi = "https://doi.org/10.1177/17540739231214533" # 以https://doi.org/开头
+authors = "Victor Chung, Julie Grèzes and Elisabeth Pacherie"
+journal = "Emotion Review"
+publish = "19 September 2023" # 如发发布年份，期号，卷号，页码
+category = "Emotion" # Emotion, Face, Cross-culture等，注意首字母大写
+summary = "作者主张进行集体情绪的实验研究，以补充集体情绪普遍特征与前因后果的实验证据。作者首先从理论框架的概述开始，确定集体情绪的三个特征：情绪校准（emotion alignment）、一体感（felling of togetherness）、相互意识（mutual awareness），并检验其相应的候选机制。" # 中文的概括
+abstract = "Research on collective emotion spans social sciences, psychology and philosophy. There are detailed case studies and diverse theories of collective emotion. However, experimental evidence regarding the universal characteristics, antecedents and consequences of collective emotion remains sparse. Moreover, current research mainly relies on emotion self-reports, accounting for the subjective experience of collective emotion and ignoring their cognitive and physiological bases. In response to these challenges, we argue for experimental research on collective emotion. We start with an overview of theoretical frameworks to identify a set of three characteristics of collective emotion. Based on research in cognitive and affective sciences, we then examine the corresponding candidate mechanisms. Finally, we highlight outstanding questions, review experimental evidence, and suggest ideas for future experimental research."
+keywords = "Collective emotion" # 用英文逗号分隔
