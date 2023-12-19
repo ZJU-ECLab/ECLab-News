@@ -1,0 +1,14 @@
+[editor]
+name = "Jiaying Lu"
+degree = "Undergraduate, 2021"
+
+[article.1]
+title = "Existential threat and responses to emotional displays of ingroup and outgroup members"
+doi = "https://doi.org/10.1177/13684302221128229"
+authors = "Janet Wessler, Job van der Schalk, Jochim Hansen, Johannes Klackl, Eva Jonas, Maurice Fons, Bertjan Doosje, and Agneta Fischer"
+journal = "Group Processes & Intergroup Relations"
+publish = "Volume 26, Issue 8, December 2023, Pages 1866-1887"
+category = "Emotion, Face"
+summary = "本研究探讨了死亡提醒下情绪表达对内外群体反应的影响。研究发现，在死亡提醒下，愤怒增加了对内群体的偏爱和对外群体的贬低，而快乐减少了对内群体的偏爱并增加了对外群体的积极态度。结果表明，在威胁环境下，情绪表达能够决定人们是与陌生他人保持距离还是尽可能建立友好关系。"
+abstract = "The present research investigates how emotional displays shape reactions to ingroup and outgroup members when people are reminded of death. We hypothesized that under mortality salience, emotions that signal social distance promote worldview defense (i.e., increased ingroup favoritism and outgroup derogation), whereas emotions that signal affiliation promote affiliation need (i.e., reduced ingroup favoritism and outgroup derogation). In three studies, participants viewed emotional displays of ingroup and/or outgroup members after a mortality salience or control manipulation. Results revealed that under mortality salience, anger increased ingroup favoritism and outgroup derogation (Study 1), enhanced perceived overlap with the ingroup (Study 3), and increased positive facial behavior to ingroup displays—measured via the Facial Action Coding System (Studies 1 and 2) and electromyography of the zygomaticus major muscle (Study 3). In contrast, happiness decreased ingroup favoritism and outgroup derogation (Study 2), and increased positive facial behavior towards outgroup members (Study 3). The findings suggest that, in times of threat, emotional displays can determine whether people move away from unfamiliar others or try to form as many friendly relations as possible."
+keywords = "affiliation, emotional displays, facial behavior, mortality salience, outgroup derogation"
