@@ -1,0 +1,36 @@
+[editor]
+name = "Jingyi Yang"
+degree = "Undergraduate, 2022"
+
+[article.1]
+title = "A Cantonese Audio-Visual Emotional Speech (CAVES) dataset."
+doi = "https://doi.org/10.3758/s13428-023-02270-7"
+authors = "Chee Seng Chong, Chris Davis & Jeesun Kim"
+journal = "BEHAVIOR RESEARCH METHODS"
+publish = "28 Nov 2023"
+category = "Emotion"
+summary = "本研究提供了一个粤语视听情感语音（CAVES）数据集，适用于探索情感语音如何在听觉、视觉和听觉-视觉呈现中以声调语言表达。"
+abstract = "We present a Cantonese emotional speech dataset that is suitable for use in research investigating the auditory and visual expression of emotion in tonal languages. This unique dataset consists of auditory and visual recordings of ten native speakers of Cantonese uttering 50 sentences each in the six basic emotions plus neutral (angry, happy, sad, surprise, fear, and disgust). The visual recordings have a full HD resolution of 1920 * 1080 pixels and were recorded at 50 fps. The important features of the dataset are outlined along with the factors considered when compiling the dataset. A validation study of the recorded emotion expressions was conducted in which 15 native Cantonese perceivers completed a forced-choice emotion identification task. The variability of the speakers and the sentences was examined by testing the degree of concordance between the intended and the perceived emotion. We compared these results with those of other emotion perception and evaluation studies that have tested spoken emotions in languages other than Cantonese. The dataset is freely available for research purposes."
+keywords = "Auditory and visual expressions, Cantonese dataset, Dataset evaluation, Emotional speech"
+
+[article.2]
+title = "Denver pain authenticity stimulus set (D-PASS)."
+doi = "https://doi.org/10.3758/s13428-023-02283-2"
+authors = "E. Paige Lloyd, Kevin M. Summers, Christopher A. Gunderson, Rachael E. Weesner, Leanne ten Brinke, Kurt Hugenberg & Allen R. McConnell"
+journal = "BEHAVIOR RESEARCH METHODS"
+publish = "22 Nov 2023"
+category = "Emotion"
+summary = "本研究创建了一个疼痛真实性数据库--丹佛疼痛真实性刺激集（D-PASS），其中包含105个独特个体表达真实疼痛和假装疼痛的315个视频，可以用于研究种族在疼痛表达、感知和真实性检测中的作用，但仍具有一定局限性。"
+abstract = "We introduce the Denver Pain Authenticity Stimulus Set (D-PASS), a free resource containing 315 videos of 105 unique individuals expressing authentic and posed pain. All expressers were recorded displaying one authentic (105; pain was elicited via a pressure algometer) and two posed (210) expressions of pain (one posed expression recorded before [posed-unrehearsed] and one recorded after [posed-rehearsed] the authentic pain expression). In addition to authentic and posed pain videos, the database includes an accompanying codebook including metrics assessed at the expresser and video levels (e.g., Facial Action Coding System metrics for each video controlling for neutral images of the expresser), expressers' pain threshold and pain tolerance values, averaged pain detection performance by naive perceivers who viewed the videos (e.g., accuracy, response bias), neutral images of each expresser, and face characteristic rating data for neutral images of each expresser (e.g., attractiveness, trustworthiness). The stimuli and accompanying codebook can be accessed for academic research purposes from https://digitalcommons.du.edu/lsdl_dpass/1/ . The relatively large number of stimuli allow for consideration of expresser-level variability in analyses and enable more advanced statistical approaches (e.g., signal detection analyses). Furthermore, the large number of Black (n=41) and White (n=56) expressers permits investigations into the role of race in pain expression, perception, and authenticity detection. Finally, the accompanying codebook may provide pilot data for novel investigations in the intergroup or pain sciences."
+keywords = "Emotion, Intergroup relations, Interpersonal sensitivity, Pain"
+
+[article.3]
+title = "Vienna Talking Faces (ViTaFa): A multimodal person database with synchronized videos, images, and voices."
+doi = "https://doi.org/10.3758/s13428-023-02264-5"
+authors = "Christina Krumpholz, Cliodhna Quigley, Leonida Fusani & Helmut Leder"
+journal = "BEHAVIOR RESEARCH METHODS"
+publish = "10 Nov 2023"
+category = "Face"
+summary = "本研究提供一个专注于社会感知多模态研究的高质量视听数据库Vienna Talking Faces (ViTaFa)，该数据库可为研究社会感知的视听信号提供资源。"
+abstract = "Social perception relies on different sensory channels, including vision and audition, which are specifically important for judgements of appearance. Therefore, to understand multimodal integration in person perception, it is important to study both face and voice in a synchronized form. We introduce the Vienna Talking Faces (ViTaFa) database, a high-quality audiovisual database focused on multimodal research of social perception. ViTaFa includes different stimulus modalities: audiovisual dynamic, visual dynamic,visual static, and auditory dynamic. Stimuli were recorded and edited under highly standardized conditions and were collected from 40 real individuals, and the sample matches typical student samples in psychological research (young individuals aged 18 to 45). Stimuli include sequences of various types of spoken content from each person, including German sentences, words, reading passages, vowels, and language-unrelated pseudo-words. Recordings were made with different emotional expressions (neutral, happy, angry, sad, and flirtatious). ViTaFa is freely accessible for academic non-profit research after signing a confidentiality agreement form via https://osf.io/9jtzx/ and stands out from other databases due to its multimodal format, high quality, and comprehensive quantification of stimulus features and human judgements related to attractiveness. Additionally, over 200 human raters validated emotion expression of the stimuli. In summary, ViTaFa provides a valuable resource for investigating audiovisual signals of social perception."
+keywords = "Face, Voice, Audiovisual integration, Social perception, Attractiveness"
