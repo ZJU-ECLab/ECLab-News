@@ -1,0 +1,25 @@
+[editor]
+name = "Yihan Fu" 
+degree = "Undergraduate, 2021"
+
+[article.1] 
+title = "Dominance and prestige in romantic relationships: Actor and partner links to relationship quality"
+doi = "https://doi.org/10.1177/02654075231212940" 
+authors = "Robert Körner, Brett A. Murphy, Erez Zverling, Ami Sha’ked, and Astrid Schütz"
+journal = "Journal of Social and Personal Relationships"
+publish = "November 7, 2023" 
+category = "Culture"
+summary = "这项研究旨在探讨支配（dominance）与声望（prestige）对恋爱关系质量的影响，通过在德国、以色列和美国进行四项研究，发现声望对关系质量有积极影响，而支配则对关系幸福感有负面影响，且在性别之间存在一定差异。"
+abstract = "Dominance and prestige reflect different forms of power and can affect relationship outcomes. Whereas dominance is a conflict-oriented way of dealing with people and grabbing status, prestige is derived from respect and esteem that is granted by others due to superior skills and knowledge. In this research, we tested three partially competing perspectives on potential associations of dominance and prestige with relationship quality (RQ). Sociobiological perspectives suggest that both concepts ensure the provision of valuable resources, and thus predict that both dominance and prestige would be positively linked to RQ. From a sociocultural perspective, men are expected to be dominant and prestigious whereas being dominant (and perhaps being prestigious) would violate the feminine gender-role stereotype; thus, both variables should relate positively to RQ only for men. From a personality perspective, dominance is characterized by undesirable attributes, whereas prestige is characterized by more desirable attributes; as such, only prestige should be positively related to RQ. We conducted four studies with individuals in romantic relationships in three different countries (Germany, Israel, and the US; Ntotal = 2,010 participants). The participants completed measures of dominance-prestige (as general attributes, as relationship-specific attributes, or in comparison with their partner) and measures of RQ. Although not entirely consistent across studies, our results were most consistent with the personality-based perspective. Prestige seems to benefit a relationship for both actors and partners whereas dominance is detrimental to relationship happiness. Yet, as some results showed that the negative link between dominance and RQ was stronger for women than for men, and the positive link between prestige and RQ was weaker for women than for men; thus some weak support for the sociocultural perspective was also found.”
+keywords = "Dominance, Prestige, Relationship Quality, Sociocultural Perspective"
+
+[article.2] 
+title = "Through the cultural looking glass: Diversity ideologies and cultural sharing in intercultural romantic relationships"
+doi = "https://doi.org/10.1177/02654075231208727" 
+authors = "Hanieh Naeimi, Alexandria L. West, Amy Muise, Matthew D. Johnson, Emily A. Impett "
+journal = "Journal of Social and Personal Relationships"
+publish = "November 7, 2023"
+category = "Culture"
+summary = "这项研究探讨了多样化意识形态对跨文化恋爱关系中交流文化差异和影响关系质量的影响，发现色盲观念（colorblindness，忽视文化差异）可能导致关系复杂化，而多元文化或多文化观念则有助于提高关系质量"
+abstract = "Intercultural romantic relationships are increasingly common. While past work has focused on how satisfied intercultural couples are compared to monocultural couples, we focus on factors within intercultural relationships that predict partners’ relationship quality. We propose that diversity ideologies—people’s beliefs about cultural diversity—are one set of factors that influence communication about cultural differences and relationship quality. Across two cross-sectional studies of individuals and one longitudinal study of couples in intercultural relationships (Ntotal = 838), we found that people who endorsed colorblindness—ignored cultural differences—expressed their own culture more but accepted their partner’s culture less in the relationship, in turn experiencing mixed relational outcomes. However, participants who endorsed multiculturalism—acknowledged cultural differences and aimed to preserve cultures as distinct—or polyculturalism—recognized cultural differences and viewed cultures as interconnected—expressed their own culture and accepted their partner’s culture more and in turn experienced higher relationship quality. Our studies provide the first empirical examination of how diversity ideologies shape the way intercultural couples communicate about their cultural differences and subsequently impact their relationship quality"
+keywords = "Romantic Relationships, Diversity Ideologies, Relationship Quality, Cultural Communication."
