@@ -1,0 +1,26 @@
+[editor]
+name = "jingli Liu"
+degree = "Undergraduate, 2021"
+
+[article.1]
+title = "The dark and bright side of the numbers: how emotions influence mental number line accuracy and bias"
+doi = "https://doi.org/10.1080/02699931.2023.2285834"
+authors = "Saied Sabaghypour, Farhad Farkhondeh Tale Navi, Elena Kulkova, Parnian Abaduz, Negin Zirak & Mohammad Ali Nazari"
+journal = "Cognition and Emotion"
+publish = "Published online: 21 Nov 2023" 
+category = "Emotion" 
+summary = "本研究旨在探讨情绪效价对心理数轴上数字表征的准确性和偏倚的影响。结果表明正价组表现出向右偏倚，而负价组表现出左偏倚，且负价组的错误率高于正价组，为情绪和数字认知之间的相互作用提供了新的见解。" 
+abstract = "The traditional view of cognition as detached from emotions is recently being questioned. This study aimed to investigate the influence of emotional valence on the accuracy and bias in the representation of numbers on the mental number line (MNL). The study included 164 participants who were randomly assigned into two groups with induced positive and negative emotional valence using matched arousal film clips. Participants performed a computerised number-to-position (CNP) task to estimate the position of numbers on a horizontal line. The results showed that participants in the positive valence group exhibited a rightward bias, while those in the negative valence group showed an opposite pattern. The analysis of mean absolute error revealed that the negative valence group had higher error rates compared to the positive valence group. Furthermore, the MNL estimation pattern analysis indicated that a two-cycle cyclic power model (CPM) best explained the data for both groups. These findings suggest that emotional valence influences the spatial representation of numbers on the MNL and affects accuracy in numerical estimations. Our findings are finally discussed in terms of body-specificity and the Brain’s Asymmetric Frequency Tuning (BAFT) theories. The study provides new insights into the interplay between emotions and numerical cognition."
+keywords = "Emotional valence, mental number line, accuracy, bias, numerical cognition" 
+
+[article.2]
+title = "When mind and body align: examining the role of cross-modal congruency in conscious representations of happy facial expressions"
+doi = "https://doi.org/10.1080/02699931.2023.2285823"
+authors = "Thomas Quettier, Elena Moro, Naotsugu Tsuchiya & Paola Sessa"
+journal = "Cognition and Emotion"
+publish = "Published online: 24 Nov 2023" 
+category = "Face" 
+summary = "本研究探讨了面部模仿与观察表情的一致性如何影响有意识面部表情表征的稳定性。结果表明，模仿操作显著影响了快乐面孔的累积时间，强调了一致性模仿在稳定面部表情意识方面的重要性，支持了具身认知模型，表明本体感受信息的整合明显偏向于面部表情的有意识视觉感知。" 
+abstract = "This study explored how congruency between facial mimicry and observed expressions affects the stability of conscious facial expression representations. Focusing on the congruency effect between proprioceptive/sensorimotor signals and visual stimuli for happy expressions, participants underwent a binocular rivalry task displaying neutral and happy faces. Mimicry was either facilitated with a chopstick or left unrestricted. Key metrics included Initial Percept (bias indicator), Onset Resolution Time (time from onset to Initial Percept), and Cumulative Time (content stabilization measure). Results indicated that mimicry manipulation significantly impacted Cumulative Time for happy faces, highlighting the importance of congruent mimicry in stabilizing conscious awareness of facial expressions. This supports embodied cognition models, showing the integration of proprioceptive information significantly biases conscious visual perception of facial expressions."
+keywords = "Facial mimicry, facial expressions, sensorimotor simulation, binocular rivalry, visual awareness" 
+
