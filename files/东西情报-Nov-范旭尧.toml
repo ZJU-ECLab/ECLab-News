@@ -1,0 +1,25 @@
+[editor]
+name = "Xuyao Fan"
+degree = "Undergraduate, 2021"
+
+[article.1]
+title = "The “Happy Face Killer” in the eyes of the beholder: Relational encoding of facial emotions in context influences trustworthiness attributions"
+doi = "https://doi.org/10.1016/j.jesp.2023.104517"
+authors = "Simone Mattavelli, Gaia Carlotta Fiamberti, Matteo Masi, Marco Brambilla"
+journal = "Journal of Experimental Social Psychology"
+publish = "Volume 109, November 2023, 104517"
+category = "Face, Emotion"
+summary = "研究表明，面孔在威胁性情境中的可信度较低。本研究通过两个实验测试开心和恐惧的面孔情绪对威胁性情境中面孔的可信度及聪明程度的影响。结果表明，威胁性情境中开心面孔的可信度比恐惧面孔更低，而面孔的聪明程度不受情境-面孔整合的影响。"
+abstract = "Research on face perception has established that faces surrounded by threatening contexts are perceived as less trustworthy. Moreover, recent studies revealed that such a face-context integration effect is moderated by the nature of the relational qualifier connecting the face and the context: presenting a face as belonging to either the perpetrator or the victim of the threatening context changes its perceived trustworthiness. Here, we asked whether relational qualifiers can also be extracted from subtle facial cues. In two preregistered studies (N = 225), we tested whether face-context integration is qualified by facial emotions. In Experiment 1, faces appeared with either happy or fearful emotional expressions in threatening contexts (vs. no context). Facial emotions moderated face-context integration: The negative impact of contextual threat on attributed trustworthiness showed stronger for happy than fearful faces. In Experiment 2, participants judged the emotional stimuli on both trustworthiness and smartness. Emotions altered face-context integration when judging trustworthiness but did not alter smartness judgments. Moreover, participants' tendency to judge happy faces in threatening contexts as less trustworthy correlated with their belief that the target face belonged to the criminal on the scene. The importance of considering relational encoding when studying person perception is discussed."
+keywords = "Face perception, Context, Emotions, Trustworthiness, Relational encoding"
+
+[article.2]
+title = "Women exaggerate, men downplay: Gendered endorsement of emotional dramatization stereotypes contributes to gender bias in pain expectations"
+doi = "https://doi.org/10.1016/j.jesp.2023.104520"
+authors = "Gina A. Paganini, Kevin M. Summers, Leanne ten Brinke, E. Paige Lloyd"
+journal = "Journal of Experimental Social Psychology"
+publish = "Volume 109, November 2023, 104520"
+category = "Emotion"
+summary = "性别疼痛夸大偏见是一种认为女性相对于男性更可能夸大而非淡化疼痛的效应。本研究通过四个实验发现，性别疼痛夸大偏见由认为女性表达情绪更戏剧化的想法导致，并受性别刻板印象影响。这个结果有望对女性疼痛报告的低估和治疗不足产生影响。"
+abstract = "The current work tested whether perceivers believe that women, relative to men, are likely to exaggerate versus downplay pain, an effect we refer to as the gender-pain exaggeration bias. The gender-pain exaggeration bias was operationalized as the extent to which perceivers believe women, relative to men, claim more pain than they feel. Across four experiments, we found that women were expected to exaggerate pain more than men and men were expected to downplay pain more than women (Studies 1–4). Further, judgments that women were more emotionally dramatizing than men contributed to this gender-pain exaggeration bias (Studies 2 and 4). We also assessed whether perceiver-level differences in endorsement of gendered emotional dramatization stereotypes (Studies 3–4) moderated this gender-pain exaggeration bias and found that endorsement of gendered emotional dramatization stereotypes moderated this bias. In sum, we document a relative gender-pain exaggeration bias wherein perceivers believe women, relative to men, to be emotionally dramatizing and therefore more likely to exaggerate versus downplay their pain. This bias may lead perceivers to interpret women's, relative to men's, pain reports as overstatements, inauthentic, or dramatized. Thus, the current work may have implications for well-documented biases in perceptions of (i.e., underestimating) and responses to (i.e., undertreating) women's pain."
+keywords = "emotion, gender, impression formation, pain, person perception"
