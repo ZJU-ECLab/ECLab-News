@@ -1,0 +1,14 @@
+[editor]
+name = "Shuoan Li"
+degree = "Undergraduate, 2022"
+
+[article.1]
+title = "Automating the analysis of facial emotion expression dynamics: A computational framework and application in psychotic disorders."
+doi = "https://doi.org/10.1073/pnas.2313665121"
+authors = "Nathan T. Hall, M. Hallquist, Elizabeth A Martin, Wen-xian Lian, Katherine G. Jonas, Roman Kotov"
+journal = "PNAS"
+publish = "Vol. 121, No. 14"
+category = "Emotion,Face"
+summary = "本研究提出了一种利用机器学习网络建模的方法来量化分析短暂的面部表情变化。研究者们利用该方法分析了不同精神病患者和健康成人的访谈视频，发现精神分裂症患者的面部表情更容易从中性转向恐惧或惊讶，而其他精神疾病患者更容易转向悲伤。这种方法可以用于研究正常和异常的情绪表达，可能用于改善远程医疗中的精神疾病评估和治疗。"
+abstract = "Facial emotion expressions play a central role in interpersonal interactions; these displays are used to predict and influence the behavior of others. Despite their importance, quantifying and analyzing the dynamics of brief facial emotion expressions remains an understudied methodological challenge. Here, we present a method that leverages machine learning and network modeling to assess the dynamics of facial expressions. Using video recordings of clinical interviews, we demonstrate the utility of this approach in a sample of 96 people diagnosed with psychotic disorders and 116 never-psychotic adults. Participants diagnosed with schizophrenia tended to move from neutral expressions to uncommon expressions (e.g., fear, surprise), whereas participants diagnosed with other psychoses (e.g., mood disorders with psychosis) moved toward expressions of sadness. This method has broad applications to the study of normal and altered expressions of emotion and can be integrated with telemedicine to improve psychiatric assessment and treatment."
+keywords = "Emotion dynamics, facial emotion, facial expression analysis, network model, psychosis"
