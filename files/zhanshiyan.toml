@@ -1,0 +1,14 @@
+[editor]
+name = "Shiyan Zhan"
+degree = "Postgraduate, 2024"
+
+[article.1]
+title = "Do They Look the Same Unless They Are Angry? Investigating the Other-Race Effect in the Presence of Angry Expressions"
+doi = "https://doi.org/10.1177/09567976231218640"
+authors = "Roland Imhoff, Barbara C. N. Müller & Verena Heidrich"
+journal = "Psychological Science"
+publish = "Volume 35, Issue 4"
+category = "Facial expression, Cross-culture"
+summary = "本研究通过396名白人被试复刻Ackerman等人于2006年发现的异族效应（other-race effect, ORE），并通过操纵刺激的标准化程度和被试对实验目的的知晓程度加以创新。结果显示，在利用原始材料时实验结果与Ackerman等人一致，但在使用更加标准化的刺激时却未能复刻Ackerman等人的结果。"
+abstract = "Ethnic out-group members are disproportionately more often the victim of misidentifications. The so-called other-race effect (ORE), the tendency to better remember faces of individuals belonging to one’s own ethnic in-group than faces belonging to an ethnic out-group, has been identified as one causal ingredient in such tragic incidents. Investigating an important aspect for the ORE—that is, emotional expression—the seminal study by Ackerman and colleagues (2006) found that White participants remembered neutral White faces better than neutral Black faces, but crucially, Black angry faces were better remembered than White angry faces (i.e., a reversed ORE). In the current study, we sought to replicate this study and directly tackle the potential causes for different results with later work. Three hundred ninety-six adult White U.S. citizens completed our study in which we manipulated the kind of employed stimuli (as in the original study vs. more standardized ones) whether participants knew of the recognition task already at the encoding phase. Additionally, participants were asked about the unusualness of the presented faces. We were able to replicate results from the Ackerman et al. (2006) study with the original stimuli but not with more standardized stimuli."
+keywords = "other-race effect, categorization, stereotyping, replication, stimulus sampling, open data, open materials, preregistered"
