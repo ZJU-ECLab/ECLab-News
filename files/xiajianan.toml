@@ -1,0 +1,36 @@
+[editor]
+name = "Jianan XIA"
+degree = "Undergraduate, 2020"
+
+[article.1]
+title = "Perceiving the outlier in the crowd: The influence of facial identity"
+doi = "https://doi.org/10.1177/03010066231218519"
+authors = "Yuting Ping , Yiyun Ouyang, Manhua Zhang, Wen Zheng"
+journal = "Perception"
+publish = "Volume 53, issue 3, Pages  163–179"
+category = "Face"
+summary = "本研究发现人们会放大对群体中异常情绪（outlier）的感知，并且亲密朋友的表情对于人们感知群体情绪的强度贡献更大，即在处理熟悉面孔的情绪中更占优势。"
+abstract = "The accurate perception of groups with outliers can help us identify potential risks. However, it is unclear how outliers affect the perception of group emotion. To address this question, we conducted a study on group emotion perception in the context of facial identity. We presented 74 participants with pictures of crowds, and asked them to evaluate the valence ratios and intensity of the crowd by means of the Emotional Aperture Measure. The results revealed that outlier emotions were often overestimated within crowds. Moreover, we found that the emotional expression of a close friend modulated the perception of outliers. Specifically, when a close friend expressed the group emotion, participants overestimated the outlier less than when a close friend expressed the outlier emotion. These results suggest that people can detect outliers within groups, and that their perception of group emotion is influenced by close friends. Thus, we provide evidence that facial identity affects group emotion perception."
+keywords = "group emotion, outlier emotion, close friends, emotion perception, emotion intensity"
+
+[article.2]
+title = "Influence of the human body odor compound HMHA on face perception"
+doi = "https://doi.org/10.1177/03010066231222473"
+authors = "Camille Ferdenzi, Arnaud Fournel, Nicolas Baldovini, Daphnée Poupon , Déborah Ligout, Marc Thévenet, Romain Bouet and Moustafa Bensafi"
+journal = "Perception"
+publish = "Volume 53, issue 3, Pages  180–196"
+category = "Face"
+summary = "本研究通过呈现100ms的面部表情与特定气味并让参与者尽快确定面部性别和吸引力的方式，发现HMHA(3-羟基-3-甲基己酸)存在的情况下，面孔的吸引力会不以性别特异性的方式增加。"
+abstract = "Body odors convey information about the individuals, but the mechanisms are not fully understood yet. As far as human reproduction is concerned, molecules that are produced in sexually dimorphic amounts could be possible chemosignals. 3-hydroxy-3-methylhexanoic acid (HMHA) is one of them—more typical of men. Here, we investigated the possibility that the perception of gender and attractiveness in human faces could be implicitly influenced by this compound. Clearly feminine, ambiguous and clearly masculine faces were primed with an odor of HMHA, a control odor or air. Based on 100-ms face presentation, 40 raters had to identify the face's gender as quickly as possible and provide attractiveness evaluations. 3-hydroxy-3-methylhexanoic acid tended to be perceived as less pleasant and induced lower sniff duration in women compared with men. As to the effects of HMHA on face perception (vs. control conditions), we found that gender identification and the associated response time were unaffected by HMHA. Attractiveness of the faces, however, increased in presence of HMHA, but not in a sex-specific manner and only for unattractive faces with ambiguous gender. In sum, this study found no evidence in favor of a possible role of this sexually dimorphic compound in intrasexual competition nor in intersexual attraction."
+keywords = "human chemical communication, body odor, face perception, gender, attractiveness"
+
+[article.3]
+title = "Cross-Cultural Differences in Perception of Facial Trustworthiness Based on Geometric Morphometric Morphs"
+doi = "https://doi.org/10.1177/00220221231220013"
+authors = "Victoria V. Rostovtseva, Marina L. Butovskaya, Anna A. Mezentseva, Nadezhda B. Dashieva, Anna A. Korotkova, Alexander Kavina and Mewa Singh"
+journal = "Journal of Cross-Cultural Psychology"
+publish = "Volume 55, issue 2, Pages  216–235"
+category = "Face"
+summary = "本研究发现布里亚特人面部特征与其可信度之间的关联仅存在于男性对于男性照片的评分，其中不可信的面部形状的特征是下颌相对较窄，眉毛较低。此外，研究发现随着种群之间的地理和遗传距离增加，感知的可信度与布里亚特人本身的判断一致性会下降。"
+abstract = "We report on an experimental study that explores cross-cultural differences in perception of trustworthiness based on facial traits. In the first part of the experiment, individual male and female neutral photographs of Buryats (Mongolian people of Eastern Siberia) were rated on trustworthiness by men and women from the same population. The trustworthy-looking facial traits were investigated by means of geometric morphometrics, and analysis of the facial action units using artificial neural network (FaceReader). Significant associations between facial traits and perceived trustworthiness were revealed only for male photographs rated by men. Facial shape pattern along trustworthy–untrustworthy vector corresponded to the facial femininity-masculinity vector for Buryats, as well as to the positive-negative vector of the emotional connotation of the neutral facial shape. "Untrustworthy"facial shape was characterized by relatively narrower lower jaw, lower set eyebrows, as well as a lower position of the "Brow Lowerer"facial action unit—a frown. In the second part of the experiment, two geometric morphometric morphs, representing "trustworthy" and  "untrustworthy" Buryat male facial shapes, were judged on trustworthiness by male representatives of Buryat, Tuvan (Mongolian people of Southern Siberia), Russian, Indian, and East African (Tanzanians) cultures. The results revealed that in all studied samples the "trustworthy" male portrait was rated significantly higher on trustworthiness than "untrustworthy" one. However, perceived trustworthiness, and agreement of portrait judgments with those of Buryats significantly declined with geographic and genetic distance between populations."
+keywords = "trustworthiness, facial shape, cross-cultural studies, geometric morphometrics, FaceReader, facial action units, masculinity"

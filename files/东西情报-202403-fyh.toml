@@ -1,0 +1,14 @@
+[editor]
+name = "Yihan Fu" 
+degree = "Undergraduate, 2021"
+
+[article.1] 
+title = "Examining the effects of reciprocal emoji use on interpersonal and communication outcomes"
+doi = "https://doi.org/10.1177/02654075231219032" 
+authors = "Bernardo P. Cavalheiro, Marília Prada, and David L. Rodrigues"
+journal = "Journal of Social and Personal Relationships"
+publish = "March 3, 2024" 
+category = "Emotion"
+summary = "这项研究表明，在工作环境中使用表情符号，尤其是相互使用表情符号，可以增进人们对对话参与者的印象和交流效果，但在冲突情境下可能不会产生相同的影响。"
+abstract = "Research has shown that emoji can determine how interlocutors who use emoji are perceived (e.g., warmer) and can help complement written communication (e.g., clarify the meaning of a message). We argue that reciprocal emoji use may be particularly beneficial for user perceptions and communication outcomes. In two experiments (N = 568), we examined if using emoji, and reciprocating emoji use, in a work context (i.e., message between colleagues) influenced inferences about interlocutors and communication outcomes (Study 1), and if such effects differed according to the level of conflict between interlocutors (Study 2). Study 1 showed that using💪  (vs.✍️ ) resulted in higher perceptions of warmth, playfulness, and message’s positivity, whereas no benefits of using 👎 (vs.✍️ ) were observed. Likewise, reciprocating emoji use (🤷 vs. no emoji) resulted in higher perceptions of warmth, playfulness, and communication positivity. Study 2 showed only an effect of conflict in the scenario, such that, regardless of reciprocal emoji use, in the lower (vs. higher) conflict situation, perceptions of the interlocutor (e.g., warmer, more competent, more playful), and the conversation (e.g., messages more positive, less confrontational) were more favorable. Overall, our results reinforce the importance of emoji valence for person perception and communication outcomes, while also suggesting some emoji may not impact communication under specific circumstances (e.g., during situations of conflict)."
+keywords = "emoji, work context, communication outcomes, conflict, interpersonal impressions"

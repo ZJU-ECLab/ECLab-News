@@ -1,0 +1,36 @@
+[editor]
+name = "Chengjie Yang"
+degree = "Undergraduate, 2022"
+
+[article.1]
+title = " Cultural Psychology : Beyond East and West"
+doi = "https://doi.org/10.1146/annurev-psych-021723-063333"
+authors = "Shinobu Kitayama, Cristina E.Salvador"
+journal = "Annual Review of Psychology"
+publish = "Volume 75, pages 495-526, 2024"
+category = "Culture"
+summary = "该研究旨在展示文化心理学的前景。研究通过三个步骤：1.考察该领域主要理论视角，包括自我独立与相互依存，个人主义与集体主义，社会规范的紧密与松散，以及关系流动性。2.深入探讨生态文化复合体在几千年的文化演变中，所塑造的心理特征。3.考察一些非西方文化区，探讨其对于西方文化区形成的贡献。通过以上步骤，揭示不同文化背景下相互依存的复杂性。"
+abstract = " Research in cultural psychology over the last three decades has revealed the profound influence of culture on cognitive, emotional, and motivational processes shaping individuals into active agents. This article aims to show cultural psychology’s promise in three key steps. First, we review four notable cultural dimensions believed to underlie cultural variations: independent versus interdependent self, individualism versus collectivism,tightness versus looseness of social norms, and relational mobility. Second, weexaminehowecologyandgeographyshapehumanactivitiesandgiverise to organized systems of cultural practices and meanings, called eco-cultural complexes. In turn, the eco-cultural complex of each zone is instrumental in shaping a wide range of psychological processes, revealing a psychological diversity that extends beyond the scope of the current East–West literature. Finally, we examine some of the non-Western cultural zones present today, including Arab,East Asian,Latin American,and South Asian zones,and discuss how they may have contributed,to varying degrees,to the formation of the contemporary Western cultural zone."
+keywords = "culture, independence vs interdependence, individualism vs collectivism, eco-cultural complex, gene–culture coevolution, varieties of interdependence"
+
+[article.2]
+title = " Music Training and Nonmusical Abilities"
+doi = " https://doi.org/10.1146/annurev-psych-032323051354"
+authors = " E. Glenn Schellenberg, César F. Lima"
+journal = "Annual Review of Psychology"
+publish = "Volume 75, pages 87-128, 2024"
+category = "music"
+summary = "该研究旨在探讨参与音乐的社会情感影响，尤其是在群体中。研究通过大量综述分析、纵向调查，讨论了音乐训练的研究及其与听力、语言，一般认知能力和社会情感功能的关系。得出结论：音乐训练和上述能力与表现相关，但遗传、非音乐环境等因素无法排除，无法证明因果训练效应。"
+abstract = " Music training is generally assumed to improve perceptual and cognitive abilities. Although correlational data highlight positive associations, experimentalresults are inconclusive,raising questions about causality.Does music training have far-transfer effects, or do preexisting factors determine who takes music lessons? All behavior reflects genetic and environmental influences, but differences in emphasis—nature versus nurture—have been a source of tension throughout the history of psychology. After reviewing the recent literature, we conclude that the evidence that music training causes nonmusical benefits is weak or nonexistent, and that researchers routinely overemphasize contributions from experience while neglecting those from nature.The literature is also largely exploratory rather than theory driven.It fails to explain mechanistically how music-training effects could occur and ignores evidence that far transfer is rare. Instead of focusing on elusive perceptual or cognitive benefits, we argue that it is more fruitful to examine the social-emotional effects of engaging with music, particularly in groups, and that music-based interventions may be effective mainly for clinical or atypical populations."
+keywords = "music, training, cognition, personality, transfer, plasticity"
+
+[article.3]
+title = " Schoolwork effort and emotions predict self-control in a weekly diary study"
+doi = " https://doi.org/10.1111/jopy.12833"
+authors = "Yao Wu, Terry Ng-Knight, Harriet R. Tenenbaum"
+journal = "Journal of personality"
+publish = "Volume 92, Pages: 436-456, 2024"
+category = "Emotion"
+summary = "该研究通过对孩子、家长的问卷跟踪，测量出孩子在连续五周内的作业努力、作业情绪和自我控制，得出结论：从被试间和被试内两个层面上看，孩子对作业的积极情绪有时会加强作业努力与自我控制之间的关系，且作业情绪一定程度上与自我控制过程相关。"
+abstract = "Objective: Self-control supports many positive life outcomes. However, the processes underlying the development of self-control are not well  understood. Drawing on the TESSERA model of personality development, we examined whether weekly schoolwork effort predicts self-control (in the subsequent week). We also examined the role of schoolwork emotions and whether these emotions moderated the impact of schoolwork effort on self-control based on predictions from the TESSERA model. Methods: Data are from a weekly diary study (N=98) that measured children's schoolwork effort, schoolwork emotions, and self- control during five consecu-tive weeks. Data were analyzed at the between-and within-person levels using multilevel models. Results: Between-person results show that schoolwork effort is related to vari-ations in children's self-control. Furthermore, some emotions moderated the in-fluence of schoolwork effort on self-control at the between-and within-person levels. Conclusion: In line with the TESSERA model of personality development, posi-tive state expressions of effort during schoolwork (e.g., putting in effort) predicted higher self-control in the subsequent week. However, this finding was dependent on the reactions and reinforcement children felt about their effort (e.g., emotional responses to their remote schoolwork). The discussion examines how these find-ings extend to previous literature."
+keywords = "schoolwork effort, schoolwork emotions, self-control"
