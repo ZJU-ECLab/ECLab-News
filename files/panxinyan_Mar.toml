@@ -1,0 +1,26 @@
+[editor]
+name = "Xinyan Pan"
+degree = "Undergraduate, 2023"
+
+[article.1]
+title = "The role of visual and auditory information in social event segmentation"
+doi = "https://doi.org/10.1177/17470218231176471"
+authors = "Jelena Ristic & Francesca Capozzi"
+journal = "Quarterly Journal of Experimental Psychology"
+publish = "Volume 77, Issue 3, March 2024"
+category = "affect"
+summary = "本文章研究了来自视觉和听觉模式的感知信息，无论是孤立的还是结合的，在社会事件分割中的作用。结果发现，在社会细分以及听觉和视觉信息都可用时，整体群体共识和反应一致性更高。"
+abstract = "Humans organise their social worlds into social and nonsocial events. Social event segmentation refers to the ability to parse the environmental content into social and nonsocial events or units. Here, we investigated the role that perceptual information from visual and auditory modalities, in isolation and in conjunction, played in social event segmentation. Participants viewed a video clip depicting an interaction between two actors and marked the boundaries of social and nonsocial events. Depending on the condition, the clip at first contained only auditory or only visual information. Then, the clip was shown containing both auditory and visual information. Higher overall group consensus and response consistency in parsing the clip was found for social segmentation and when both auditory and visual information was available. Presenting the clip in the visual domain only benefitted group agreement in social segmentation while the inclusion of auditory information (under the audiovisual condition) also improved response consistency in nonsocial segmentation. Thus, social segmentation utilises information from the visual modality, with the auditory cues contributing under ambiguous or uncertain conditions and during segmentation of nonsocial content."
+keywords = "Event segmentation, visual perception, multisensory perception, social interactions, social event segmentation"
+
+
+[article.2]
+title = "Prosody affects visual perception in polysyllabic words: Evidence from a letter search task"
+doi = "https://doi.org/10.1177/17470218231176691"
+authors = "Jana Hasenäcker & Frank Domahs"
+journal = "Quarterly Journal of Experimental Psychology"
+publish = "Volume 77, Issue 3, March 2024"
+category = "prosody"
+summary = "本研究通过字母搜索任务研究了韵律（包括单词重音）对多音节词字素感知的影响。结果显示，与非重读音节相比，重读音节的元音字母检测更为便利，表明韵律信息会影响视觉字母感知。此外，对响应时间分布的分析表明，即使对于最快的决策，这种影响也存在，但对于较慢的响应时间，这种影响会增加。然而，辅音没有出现系统性的重音效应。"
+abstract = "Previous research has shown that phonology influences the visual perception of a word’s letters. However, the influence of prosody, including word stress, on grapheme perception in polysyllabic words is poorly investigated. The present study addresses this issue with a letter search task. Participants searched for vowel letters (Experiment 1) and consonant letters (Experiment 2) in stressed and unstressed syllables of bisyllabic words. Results reveal facilitated vowel letter detection in stressed syllables compared with unstressed syllables, indicating that prosodic information affects visual letter perception. Moreover, an analysis of the response time distribution revealed that the effect was present even for the fastest decisions but increased for slower response times. However, no systematic stress effect emerged for consonants. We discuss possible sources and dynamics of the observed pattern and the importance to accommodate feedback processes of prosody on letter perception in models of polysyllabic word reading."
+keywords = "prosody, grapheme perception, polysyllabic words"
