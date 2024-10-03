@@ -1,13 +1,13 @@
 name: CI
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   test_generate:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
     - name: setup python
       uses: actions/setup-python@v4
       with:
@@ -18,7 +18,7 @@ jobs:
     - name: generate tex
       run: python generate-tex.py > tex/eclab-beamer.tex
     - name: build pdf
-      uses: xu-cheng/latex-action@v2
+      uses: xu-cheng/latex-action@v3
       with:
         working_directory: tex
         root_file: eclab-beamer.tex
