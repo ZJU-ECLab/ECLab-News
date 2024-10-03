@@ -5,7 +5,7 @@ import pandas as pd
 
 month = 8
 
-editor_in_chief = ["Xuyao Fan, Undergraduate, 2021", "Jiaying Lu, Undergraduate, 2021"]
+editor_in_chief = ["Shuoan Li, Undergraduate, 2022", "Feiyu Zhang, Undergraduate, 2022"]
 
 editors = []
 
@@ -52,7 +52,7 @@ def escape(input):
 for file in os.listdir("files"):
     if file.endswith(".xlsx"):
         # Extract name and degree from filename
-        editor_name, editor_degree = file[:-5].split("_")
+        editor_info = file[:-5]
         
         try:
             # Load the Excel file into a pandas DataFrame
@@ -62,7 +62,7 @@ for file in os.listdir("files"):
             articles = df.to_dict(orient='records')
             
             editor_data = {
-                'editor': {'name': editor_name, 'degree': editor_degree},
+                'editor': editor_info,
                 'article': {str(i): articles[i] for i in range(len(articles))}
             }
             
@@ -75,7 +75,7 @@ journals = []
 categories = {}
 for editor in editors:
     associate_editor.append(
-        editor["editor"]["name"].title() + ", " + editor["editor"]["degree"]
+        editor["editor"]
     )
     for key in editor["article"]:
         article = editor["article"][key]
