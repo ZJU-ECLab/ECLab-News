@@ -9,13 +9,12 @@ jobs:
       contents: write
     steps:
     - name: checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: setup python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-        cache: 'pip'
 
     - name: setup python env
       run: pip install -r requirements.txt
@@ -24,7 +23,7 @@ jobs:
       run: python generate-tex.py > tex/eclab-beamer.tex
 
     - name: build pdf
-      uses: xu-cheng/latex-action@v2
+      uses: xu-cheng/latex-action@v3
       with:
         working_directory: tex
         root_file: eclab-beamer.tex
