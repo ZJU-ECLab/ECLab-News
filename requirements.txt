@@ -1,2 +1,2 @@
-toml==0.10.2
 proces==0.1.2
+pandas

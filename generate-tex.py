@@ -1,6 +1,7 @@
-from toml import load
+# from toml import load
 from proces import full_angle_to_half_angle
 import os
+import pandas as pd
 
 month = 8
 
@@ -43,11 +44,31 @@ def escape(input):
     return input
 
 
+# for file in os.listdir("files"):
+#     try:
+#         editors.append(escape(load(os.path.join("files", file))))
+#     except:
+#         print("Error loading file: " + file)
 for file in os.listdir("files"):
-    try:
-        editors.append(escape(load(os.path.join("files", file))))
-    except:
-        print("Error loading file: " + file)
+    if file.endswith(".xlsx"):
+        # Extract name and degree from filename
+        editor_name, editor_degree = file[:-5].split("_")
+        
+        try:
+            # Load the Excel file into a pandas DataFrame
+            df = pd.read_excel(os.path.join("files", file))
+            
+            # Convert the DataFrame to a dictionary to mimic the previous TOML format
+            articles = df.to_dict(orient='records')
+            
+            editor_data = {
+                'editor': {'name': editor_name, 'degree': editor_degree},
+                'article': {str(i): articles[i] for i in range(len(articles))}
+            }
+            
+            editors.append(escape(editor_data))
+        except Exception as e:
+            print(f"Error loading file {file}: {e}")
 
 associate_editor = []
 journals = []

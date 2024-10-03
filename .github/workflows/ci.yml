@@ -1,22 +1,8 @@
 name: CI
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
-  test_format:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: checkout
-        uses: actions/checkout@v2
-      - name: setup python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-      - name: setup python env
-        run: pip install -r requirements.txt
-      - name: run test
-        run: python test.py
   test_generate:
     runs-on: ubuntu-latest
     steps:

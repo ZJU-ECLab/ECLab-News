@@ -1,40 +1,5 @@
 # ECLab东西情报Beamer模板
 
-## toml文件格式
-
-为方便收集和解析，本项目采用了toml格式存储文献信息
-
-本项目规定的标准格式为：
-
-```toml
-[editor]
-name = "你的名字" # 格式类似于Shuoan Li
-degree = "你的学位" # 格式类似于Undergraduate, 2022
-
-[article.1] # 罗马数字指定文献编号
-title = "文献标题"
-doi = "文献doi" # 以https://doi.org/开头
-authors = "文献作者"
-journal = "期刊名"
-publish = "期刊发布信息" # 如发发布年份，期号，卷号，页码
-category = "分类" # Emotion, Face, Cross-culture等，注意首字母大写
-summary = "你的概括" # 中文的概括
-abstract = "文献摘要"
-keywords = "关键词" # 用英文逗号分隔
-
-[article.2] # 参照article.1
-...
-
-[article.3]
-...
-```
-
-### *！！注意！！*
-
-- 除了summary中的内容，其余所有标点（如双引号，作者和关键词中的逗号等）用英文标点
-- 文献编号用罗马数字递增，格式为`[article.x]`
-- 等号右边的内容一定要用英文双引号括起来
-
 ## 生成pdf
 
 ### 使用GitHub Actions生成
