@@ -3,7 +3,8 @@ from proces import full_angle_to_half_angle
 import os
 import pandas as pd
 
-month = 8
+year = 2024
+month = 0
 
 editor_in_chief = ["Shuoan Li, Undergraduate, 2022", "Feiyu Zhang, Undergraduate, 2022"]
 
@@ -97,6 +98,8 @@ print(
 \\title{\\sffamily 东西情报}
 """
     + "\\subtitle{\\sffamily "
+    + str(year)
+    + "年"
     + str(month)
     + "月刊}"
 )
