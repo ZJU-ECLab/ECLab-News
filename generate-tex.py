@@ -3,9 +3,9 @@ import os
 import pandas as pd
 
 year = 2024
-month = 0
+month = 9
 
-editor_in_chief = ["Shuoan Li, Undergraduate, 2022", "Feiyu Zhang, Undergraduate, 2022"]
+editor_in_chief = ["Yihan Fu, Undergraduate, 2021", "YouLiTuZiAYi, Undergraduate, 2022"]
 
 editors = []
 
