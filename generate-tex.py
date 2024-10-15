@@ -41,7 +41,7 @@ def escape(input):
                 )
             output_dict[k] = escape(v)
         return output_dict
-    return input
+    return str(input)
 
 
 for file in os.listdir("files"):
