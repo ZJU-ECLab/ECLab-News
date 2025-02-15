@@ -7,8 +7,7 @@ RM = rm -rf
 all: $(PDF)
 
 $(PDF): $(TEX) $(CLS)
-	xelatex $<
-	xelatex $<
+	latexmk -xelatex $(PROJ)
 
 clean-misc:
 	$(RM) *.aux *.out *.toc *.nav *.log *.snm

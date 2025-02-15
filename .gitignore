@@ -7,3 +7,6 @@ venv
 */*.nav
 */*.log
 */*.snm
+*/*.fls
+*/*.xdv
+*/*.fdb_latexmk
