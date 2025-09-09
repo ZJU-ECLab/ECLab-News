@@ -15,6 +15,8 @@ def clean_text(text):
             .replace("“", '"')
             .replace("”", '"')
             .replace("–", "-")
+            .replace("\n", " ")
+            .strip()
         )
     return text
 
@@ -72,7 +74,7 @@ def generate_markdown_content(categories, year, month, chief_editors):
     md_lines.append("")
     md_lines.append("---")
     md_lines.append("")
-    md_lines.append("<center><b>点击“阅读原文”获取完整版</b></center>")
+    md_lines.append("[阅读完整版]()")
     md_lines.append("")
 
     # 2. Article Sections
