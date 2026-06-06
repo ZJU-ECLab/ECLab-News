@@ -4,9 +4,26 @@ from datetime import date
 
 import httpx
 from dateutil.parser import parse as parse_date
-from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_exception,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from ..category import term_matches
+
+
+def _retry_after_wait(exc: BaseException) -> float:
+    """Return seconds to wait from Retry-After header if present."""
+    if isinstance(exc, httpx.HTTPStatusError) and exc.response.status_code == 429:
+        retry_after = exc.response.headers.get("Retry-After")
+        if retry_after:
+            try:
+                return max(float(retry_after), 1.0)
+            except (ValueError, TypeError):
+                pass
+    return 0
 
 
 def should_retry(exc: BaseException) -> bool:
@@ -17,11 +34,26 @@ def should_retry(exc: BaseException) -> bool:
     return False
 
 
+class _smart_wait:
+    """Use Retry-After header value when available, otherwise exponential backoff."""
+
+    def __init__(self, multiplier: float = 1, min_wait: float = 2, max_wait: float = 60):
+        self._exp = wait_exponential(multiplier=multiplier, min=min_wait, max=max_wait)
+
+    def __call__(self, retry_state):
+        exc = retry_state.outcome.exception()
+        if exc:
+            header_wait = _retry_after_wait(exc)
+            if header_wait > 0:
+                return header_wait
+        return self._exp(retry_state)
+
+
 def http_retry(func):
     return retry(
         retry=retry_if_exception(should_retry),
-        wait=wait_exponential(multiplier=1, min=1, max=10),
-        stop=stop_after_attempt(3),
+        wait=_smart_wait(multiplier=1, min_wait=2, max_wait=60),
+        stop=stop_after_attempt(5),
         reraise=True,
     )(func)
 
