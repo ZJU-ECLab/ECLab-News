@@ -3,7 +3,7 @@ on:
   schedule:
     - cron: "0 18 * * 1" # Monday 18:00 UTC (~02:00 Tue CST)
   release:
-    types: [published]
+    types: [created]
   workflow_dispatch:
     inputs:
       start:
@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install uv
-        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
+        uses: astral-sh/setup-uv@v8
       - uses: actions/cache@v5
         with:
           path: ~/.cache/uv
@@ -71,21 +71,54 @@ jobs:
             --start "${{ steps.dates.outputs.start }}" \
             --end   "${{ steps.dates.outputs.end }}" \
             --output-dir .
-      - name: Upload release assets
+      - name: Upload release assets and publish
         if: github.event_name == 'release'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload "${{ github.event.release.tag_name }}" \
+          TAG="${{ github.event.release.tag_name }}"
+          gh release upload "$TAG" \
             reports/*_wechat.md \
             reports/*_lab.md \
             reports/*_lab.html \
             --clobber
-      - name: Upload artifacts
+          gh release edit "$TAG" --draft=false
+      - name: Create release (schedule/dispatch)
+        if: github.event_name != 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LABEL="${{ steps.dates.outputs.label }}"
+          gh release create "v${LABEL}" \
+            --title "ECLab News ${LABEL//_/-}" \
+            --generate-notes \
+            reports/*_wechat.md \
+            reports/*_lab.md \
+            reports/*_lab.html \
+            data/*.csv
+      - name: Upload wechat markdown
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v7
         with:
-          name: eclab-news-${{ steps.dates.outputs.label }}
+          name: eclab-news-wechat-${{ steps.dates.outputs.label }}
+          path: reports/*_wechat.md
+      - name: Upload lab markdown
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: eclab-news-lab-${{ steps.dates.outputs.label }}
+          path: reports/*_lab.md
+      - name: Upload lab html
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: eclab-news-html-${{ steps.dates.outputs.label }}
+          path: reports/*_lab.html
+      - name: Upload full archive
+        if: github.event_name != 'release'
+        uses: actions/upload-artifact@v7
+        with:
+          name: eclab-news-full-${{ steps.dates.outputs.label }}
           path: |
             reports/*_wechat.md
             reports/*_lab.md
