@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-Hans" xml:lang="zh-Hans" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>$if(title)$$title$$else$ECLab News$endif$</title>
+$for(css)$
+  <link rel="stylesheet" href="$css$" />
+$endfor$
+  <style>
+:root {
+  --accent: $if(accent-color)$$accent-color$$else$#8b3a3a$endif$;
+}
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<header id="eclab-header">
+  <div class="header-logo-wrap">
+    <img class="header-logo-img" src="https://emotionculturelab.com/wp-content/uploads/2024/09/e59bbee789874.png" alt="ECLab Logo" onerror="this.style.display='none'" />
+  </div>
+  <h1>$if(title)$$title$$else$东西情报$endif$</h1>
+  <p class="subtitle">浙江大学情绪和文化实验室 · Emotion &amp; Culture Lab, Zhejiang University</p>
+</header>
+
+<div id="page-wrapper">
+
+$if(toc)$
+<aside id="toc-sidebar">
+  <div class="toc-title">关键词 · Keywords</div>
+  <nav id="toc-nav">
+  $toc$
+  </nav>
+</aside>
+<div id="toc-overlay"></div>
+$endif$
+
+<main id="content">
+$body$
+</main>
+
+</div>
+
+$if(toc)$
+<button id="toc-toggle" aria-label="Toggle table of contents">☰</button>
+$endif$
+
+<footer id="eclab-footer">
+  <div class="footer-inner">
+    <img class="footer-logo" src="https://emotionculturelab.com/wp-content/uploads/2024/09/e59bbee789871.png" alt="ECLab" onerror="this.style.display='none'" />
+    <div class="footer-text">
+      <p class="footer-name">浙江大学情绪和文化实验室</p>
+      <p class="footer-links"><a href="https://emotionculturelab.wordpress.com">emotionculturelab.wordpress.com</a></p>
+    </div>
+  </div>
+</footer>
+
+<img id="logo-watermark" src="https://emotionculturelab.com/wp-content/uploads/2024/09/e59bbee789871.png" alt="" aria-hidden="true" onerror="this.style.display='none'" />
+
+<script>
+(function() {
+  // Scroll progress bar
+  var progressBar = document.getElementById('progress-bar');
+  if (progressBar) {
+    function updateProgress() {
+      var scrollTop = window.scrollY;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      progressBar.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+  }
+
+  // Flatten TOC: extract keyword items, remove索引/文献详情 wrappers, strip prefix
+  var nav = document.getElementById('toc-nav');
+  if (nav) {
+    var topUl = nav.querySelector('ul');
+    if (topUl) {
+      var items = [];
+      // Walk top-level li items
+      var topLis = Array.from(topUl.querySelectorAll(':scope > li'));
+      topLis.forEach(function(li) {
+        var subUl = li.querySelector(':scope > ul');
+        if (subUl) {
+          // Has children — extract keyword items from nested list
+          var subLis = subUl.querySelectorAll(':scope > li');
+          subLis.forEach(function(subLi) {
+            var subA = subLi.querySelector(':scope > a');
+            if (subA && subA.textContent.indexOf('关键词') !== -1) {
+              // Strip "关键词：" prefix for display
+              var clone = subLi.cloneNode(true);
+              var link = clone.querySelector('a');
+              if (link) {
+                link.textContent = link.textContent.replace(/^关键词[：:]\s*/, '');
+              }
+              items.push(clone);
+            }
+          });
+        } else {
+          // No children — check if it's a keyword item
+          var a = li.querySelector(':scope > a');
+          if (a && a.textContent.indexOf('关键词') !== -1) {
+            var clone = li.cloneNode(true);
+            var link = clone.querySelector('a');
+            if (link) {
+              link.textContent = link.textContent.replace(/^关键词[：:]\s*/, '');
+            }
+            items.push(clone);
+          }
+        }
+      });
+      if (items.length > 0) {
+        topUl.innerHTML = '';
+        items.forEach(function(item) { topUl.appendChild(item); });
+      }
+    }
+  }
+
+  // Wrap article detail cards
+  var anchors = document.querySelectorAll('a[id^="article-"]');
+  anchors.forEach(function(anchor) {
+    var p = anchor.parentElement;
+    if (!p || p.tagName !== 'P') return;
+    var card = document.createElement('div');
+    card.className = 'article-card';
+    card.id = anchor.id;
+    anchor.id = '';
+    p.parentNode.insertBefore(card, p);
+    p.remove();
+    var sibling = card.nextSibling;
+    while (sibling) {
+      var next = sibling.nextSibling;
+      if (sibling.nodeType === 1 && (
+        (sibling.tagName === 'P' && sibling.querySelector('a[id^="article-"]')) ||
+        sibling.tagName === 'H2'
+      )) break;
+      card.appendChild(sibling);
+      sibling = next;
+    }
+    var paragraphs = card.querySelectorAll('p');
+    if (paragraphs.length > 0) paragraphs[paragraphs.length - 1].classList.add('abstract');
+  });
+
+  // TOC sidebar toggle (mobile)
+  var toggle = document.getElementById('toc-toggle');
+  var sidebar = document.getElementById('toc-sidebar');
+  var overlay = document.getElementById('toc-overlay');
+  if (toggle && sidebar) {
+    toggle.addEventListener('click', function() {
+      sidebar.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('open');
+    });
+    if (overlay) overlay.addEventListener('click', function() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+    });
+  }
+
+  // Active TOC link tracking
+  var tocLinks = document.querySelectorAll('#toc-sidebar nav > ul > li > a[href^="#"]');
+  if (tocLinks.length > 0) {
+    var targets = [];
+    tocLinks.forEach(function(link) {
+      var id = link.getAttribute('href').slice(1);
+      var el = document.getElementById(id);
+      if (el) targets.push({ el: el, link: link });
+    });
+    function updateActive() {
+      var scrollY = window.scrollY + 60;
+      var current = null;
+      for (var i = targets.length - 1; i >= 0; i--) {
+        if (targets[i].el.offsetTop <= scrollY) { current = targets[i]; break; }
+      }
+      tocLinks.forEach(function(l) { l.classList.remove('active'); });
+      if (current) current.link.classList.add('active');
+    }
+    window.addEventListener('scroll', updateActive, { passive: true });
+    updateActive();
+  }
+})();
+</script>
+
+</body>
+</html>

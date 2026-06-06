@@ -1,0 +1,237 @@
+[project]
+name = "东西情报"
+year = 2026
+month = 4
+editor_in_chief = []
+wechat_full_version_url = ""
+
+[pandoc]
+accent_color = "#b48ead"
+
+[search]
+sources = ["crossref", "pubmed"]
+email = "3220101015@zju.edu.cn"
+ncbi_tool = "eclab-news"
+require_abstract = false
+exclude_supplemental = true
+keywords = [
+  "emotion",
+  "culture",
+  "affect",
+  "facial expression",
+  "voice",
+  "vocal expression",
+  "cross-cultural",
+  "emotion perception",
+  "emotion expression",
+  "emotion experience",
+  "feeling",
+  "mood",
+  "art",
+  "social cognition",
+  "attitude",
+  "impression",
+  "artificial intelligence",
+  "AI",
+  "personality",
+  "interpersonal relationship",
+]
+journals = [
+  "Emotion",
+  "Social Cognitive and Affective Neuroscience",
+  "Journal of Personality and Social Psychology",
+  "Journal of Experimental Social Psychology",
+  "Emotion Review",
+  "Cognition & Emotion",
+  "British Journal of Social Psychology",
+  "Personality and Social Psychology Review",
+  "European Review of Social Psychology",
+  "Advances in Methods and Practices in Psychological Science",
+  "Motivation and Emotion",
+  "Perspectives on Psychological Science",
+  "Current Directions in Psychological Science",
+  "Psychological Inquiry",
+  "Current Opinion in Psychology",
+  "Journal of Nonverbal Behavior",
+  "Psychology of Aesthetics, Creativity, and the Arts",
+  "Nature",
+  "Science",
+  "Nature Communications",
+  "Nature Human Behaviour",
+  "Proceedings of the National Academy of Sciences of the United States of America",
+  "Psychological Science",
+  "American Psychologist",
+  "Computers in Human Behavior",
+  "Science Advances",
+  "Psychological Bulletin",
+  "Psychological Review",
+  "Psychological Methods",
+  "Social Psychology and Personality Science",
+  "Personality and Social Psychology Bulletin",
+  "Journal of Experimental Psychology: General",
+  "Cultural Diversity & Ethnic Minority Psychology",
+  "Journal of Cross-Cultural Psychology",
+  "Journal of Social and Personal Relationships",
+]
+
+[search.journal_issns]
+"Emotion" = ["1528-3542", "1931-1516"]
+"Social Cognitive and Affective Neuroscience" = ["1749-5016", "1749-5024"]
+"Journal of Personality and Social Psychology" = ["0022-3514", "1939-1315"]
+"Journal of Experimental Social Psychology" = ["0022-1031", "1096-0465"]
+"Emotion Review" = ["1754-0739", "1754-0747"]
+"Cognition & Emotion" = ["0269-9931", "1464-0600"]
+"British Journal of Social Psychology" = ["0144-6665", "2044-8309"]
+"Personality and Social Psychology Review" = ["1088-8683", "1532-7957"]
+"European Review of Social Psychology" = ["1046-3283", "1479-277X"]
+"Advances in Methods and Practices in Psychological Science" = ["2515-2459", "2515-2467"]
+"Motivation and Emotion" = ["0146-7239", "1573-6644"]
+"Perspectives on Psychological Science" = ["1745-6916", "1745-6924"]
+"Current Directions in Psychological Science" = ["0963-7214", "1467-8721"]
+"Psychological Inquiry" = ["1047-840X", "1532-7965"]
+"Current Opinion in Psychology" = ["2352-250X", "2352-2518"]
+"Journal of Nonverbal Behavior" = ["0191-5886", "1573-3653"]
+"Psychology of Aesthetics, Creativity, and the Arts" = ["1931-3896", "1931-390X"]
+"Nature" = ["0028-0836", "1476-4687"]
+"Science" = ["0036-8075", "1095-9203"]
+"Nature Communications" = ["2041-1723"]
+"Nature Human Behaviour" = ["2397-3374"]
+"Proceedings of the National Academy of Sciences of the United States of America" = ["0027-8424", "1091-6490"]
+"Psychological Science" = ["0956-7976", "1467-9280"]
+"American Psychologist" = ["0003-066X", "1935-990X"]
+"Computers in Human Behavior" = ["0747-5632", "1873-7692"]
+"Science Advances" = ["2375-2548"]
+"Psychological Bulletin" = ["0033-2909", "1939-1455"]
+"Psychological Review" = ["0033-295X", "1939-1471"]
+"Psychological Methods" = ["1082-989X", "1939-1463"]
+"Social Psychology and Personality Science" = ["1948-5506", "1948-5514"]
+"Personality and Social Psychology Bulletin" = ["0146-1672", "1552-7433"]
+"Journal of Experimental Psychology: General" = ["0096-3445", "1939-2222"]
+"Cultural Diversity & Ethnic Minority Psychology" = ["1099-9809", "1939-0106"]
+"Journal of Cross-Cultural Psychology" = ["0022-0221", "1552-5422"]
+"Journal of Social and Personal Relationships" = ["0265-4075", "1460-3608"]
+
+# Optional broad labels used by the Markdown report. Matching is based on
+# collected keywords and title/abstract text.
+[categories]
+Emotion = ["emotion", "emotional", "emotion regulation"]
+"Facial Expression" = ["facial expression", "facial expressions", "face expression"]
+"Vocal Expression" = ["vocal expression", "vocal expressions", "prosody", "speech expression"]
+Affect = ["affect", "affective", "valence", "arousal"]
+"Culture" = ["cross-cultural", "cross culture", "culture", "cultural"]
+"Emotion Perception" = ["emotion perception", "emotion recognition", "perceive emotion"]
+"Emotion Expression" = ["emotion expression", "emotional expression", "express emotion"]
+"Emotion Experience" = ["emotion experience", "emotional experience", "experienced emotion"]
+Face = ["face", "faces", "facial"]
+Voice = ["voice", "vocal", "speech", "prosody"]
+Feeling = ["feeling", "feelings"]
+Mood = ["mood", "moods"]
+Art = ["art", "aesthetic", "creativity"]
+"Social Cognition" = ["social cognition", "social cognitive", "social perception"]
+Attitude = ["attitude", "attitudes"]
+Impression = ["impression", "impression formation"]
+AI = ["AI", "artificial intelligence", "machine learning", "large language model"]
+Personality = ["personality", "trait"]
+"Interpersonal Relationship" = ["interpersonal relationship", "relationship", "relationships", "social relationship"]
+
+[llm]
+provider = "litellm"
+model = "xiaomi_mimo/mimo-v2.5"
+temperature = 0.2
+api_key_env = "LLM_API_KEY"
+api_base_env = "LLM_API_BASE"
+
+[llm.prompt]
+system = "你是浙江大学情绪和文化实验室的科研文献编辑。实验室专注于情绪、文化和社会心理学研究。你擅长严格判断论文是否符合实验室兴趣，并用清晰、专业、引人入胜的中文总结英文摘要。"
+user = """
+请根据下面论文信息完成任务。
+
+实验室核心研究方向：
+- 情绪、情感、心境（emotion / affect / mood）
+- 文化、跨文化、文化差异
+- 社会心理学、社会认知、人际关系
+- 面孔、表情、声音等情绪表达与感知
+
+可用分类标签（只能从中选择）：
+Emotion, Facial Expression, Vocal Expression, Affect, Culture, Emotion Perception, Emotion Expression, Emotion Experience, Face, Voice, Feeling, Mood, Art, Social Cognition, Attitude, Impression, AI, Personality, Interpersonal Relationship
+
+实验室核心具体兴趣（与推荐标记相关）：
+- 面孔、声音、肢体等通道的情绪表达与感知
+- 情境、背景信息对情绪推断的影响
+- 特定情绪类别的体验（敬畏、羞耻、内疚、骄傲等）
+- 情绪表达/感知/体验的跨文化异同
+- 艺术中的情绪表达与感知
+- 情绪的动态表达；多通道/双模态情绪整合感知
+- 用大语言模型（LLM）研究心理学问题（AI 标签专属）
+- 用AI（如生成式AI、深度学习）研究面孔表情、情绪表达与感知
+
+相关性判断标准（严格）：
+1. 以下情况输出 0（不相关）：
+   - 纯粹关注心理健康、临床障碍、精神疾病治疗、一般健康/医学问题的论文（除非与情绪机制有强联系）。
+   - 医学、神经科学论文，除非与情绪主题有强联系。
+   - 普通的学习、教育、机器学习方法类论文。
+2. 以下情况判断为相关：
+   - 直接研究情绪、情感、心境、文化、社会认知、人际关系、情绪表达/感知的论文。
+   - 心理学其他子领域的论文，仅当它与情绪有强联系，或非常有趣（能立刻吸引任何心理学学生注意）时才保留。
+   - 符合上述 AI 标签定义的论文。
+3. 判断时优先考虑论文的核心主题，而非边缘提及。
+
+输出格式：
+- 如果不相关，只输出一个字符：0
+- 如果相关：
+  - 第一行输出分类标签，格式为 "CATEGORY: 标签1, 标签2"（只选真正符合论文核心主题的标签）。
+   - 如果论文满足以下任一条件（每期通常2-4篇），第二行输出 "RECOMMENDED: yes"：（1）直接研究面孔/声音/肢体情绪表达感知、情境/背景对情绪推断的影响、特定情绪类别体验、跨文化情绪差异、艺术情绪、动态/多通道情绪整合，且方法和发现有创新价值；（2）将AI/大语言模型与面孔表情、情绪表达/感知等核心主题结合研究的论文；（3）论文有引人入胜的故事线和主题，结论清晰有力，心理学领域的读者看到标题和摘要会想读全文。
+  - 其余行用中文写 3-4 句总结。
+
+总结写作要求：
+- 用清晰、专业但易懂的语言，避免学术黑话和过度口语化。
+- 开门见山点出论文最吸引人的核心发现或问题，让读者有兴趣继续读原文。
+- 简要交代研究背景/问题、方法或样本、主要发现。
+- 只基于标题和摘要，不要编造摘要中没有的信息。
+- 不要输出项目符号、标题或多余解释。
+
+标题：{title}
+期刊：{journal}
+作者：{authors}
+关键词：{keywords}
+匹配标签：{matched_keywords}
+分类标签：{category}
+摘要：{abstract}
+"""
+
+[search.journal_sources]
+"Advances in Methods and Practices in Psychological Science" = ["pubmed", "crossref"]
+"American Psychologist" = ["pubmed", "crossref"]
+"British Journal of Social Psychology" = ["pubmed", "crossref"]
+"Cognition & Emotion" = ["pubmed", "crossref"]
+"Computers in Human Behavior" = ["pubmed", "crossref"]
+"Cultural Diversity & Ethnic Minority Psychology" = ["pubmed", "crossref"]
+"Current Directions in Psychological Science" = ["pubmed", "crossref"]
+"Current Opinion in Psychology" = ["pubmed", "crossref"]
+Emotion = ["pubmed", "crossref"]
+"Emotion Review" = ["pubmed", "crossref"]
+"European Review of Social Psychology" = ["pubmed", "crossref"]
+"Journal of Cross-Cultural Psychology" = ["pubmed", "crossref"]
+"Journal of Experimental Psychology: General" = ["pubmed", "crossref"]
+"Journal of Experimental Social Psychology" = ["pubmed", "crossref"]
+"Journal of Nonverbal Behavior" = ["crossref"]
+"Journal of Personality and Social Psychology" = ["pubmed", "crossref"]
+"Journal of Social and Personal Relationships" = ["pubmed", "crossref"]
+"Motivation and Emotion" = ["pubmed", "crossref"]
+Nature = ["pubmed", "crossref"]
+"Nature Communications" = ["pubmed", "crossref"]
+"Nature Human Behaviour" = ["pubmed", "crossref"]
+"Personality and Social Psychology Bulletin" = ["pubmed", "crossref"]
+"Personality and Social Psychology Review" = ["pubmed", "crossref"]
+"Perspectives on Psychological Science" = ["pubmed", "crossref"]
+"Proceedings of the National Academy of Sciences of the United States of America" = ["pubmed", "crossref"]
+"Psychological Bulletin" = ["pubmed", "crossref"]
+"Psychological Inquiry" = ["crossref"]
+"Psychological Methods" = ["pubmed", "crossref"]
+"Psychological Review" = ["pubmed", "crossref"]
+"Psychological Science" = ["pubmed", "crossref"]
+"Psychology of Aesthetics, Creativity, and the Arts" = ["pubmed", "crossref"]
+Science = ["pubmed", "crossref"]
+"Science Advances" = ["pubmed", "crossref"]
+"Social Cognitive and Affective Neuroscience" = ["pubmed", "crossref"]
+"Social Psychology and Personality Science" = ["pubmed", "crossref"]

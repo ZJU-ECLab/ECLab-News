@@ -1,0 +1,38 @@
+[project]
+name = "eclab-news"
+version = "0.1.0"
+description = "Automated literature collection, Chinese summarization, and Markdown report generation for Emotion and Culture Lab."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "httpx>=0.27",
+  "litellm>=1.60",
+  "python-dateutil>=2.9",
+  "tenacity>=8.3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2",
+  "ruff>=0.6",
+]
+
+[project.scripts]
+eclab-news = "src.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src",
+  "README.md",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
