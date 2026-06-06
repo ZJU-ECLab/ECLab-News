@@ -63,12 +63,14 @@ def render_lab_markdown(
     for index, article in enumerate(article_list, 1):
         anchor = anchors[id(article)]
         is_rec = article.get("recommended", "") == "true"
-        rec_badge = "\n\n**⭐ 推荐阅读**" if is_rec else ""
+        rec_line = ["", "**⭐ 推荐阅读**"] if is_rec else []
+        abstract = value(article, "abstract", "摘要缺失")
         lines.extend(
             [
                 f'<a id="{anchor}"></a>',
                 "",
                 f"### {index}. {title(article)}",
+                *rec_line,
                 "",
                 f"**作者：** {value(article, 'authors', '作者信息缺失')}",
                 "",
@@ -78,7 +80,7 @@ def render_lab_markdown(
                 "",
                 f"**关键词：** {value(article, 'keywords', '关键词缺失')}",
                 "",
-                f"**摘要：** {value(article, 'abstract', 'Abstract 缺失')}{rec_badge}",
+                f"**摘要：** {abstract}",
                 "",
             ]
         )

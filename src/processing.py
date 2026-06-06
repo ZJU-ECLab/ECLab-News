@@ -205,6 +205,16 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
             if not _needs_enrichment(article):
                 return article
 
+            # 5c. Re-fetch truncated abstracts (start with = or ( — beginning lost)
+            if article.doi and article.abstract and article.abstract[:1] in "=(":
+                pa = pubmed.fetch_by_doi(article.doi, config)
+                if pa is not None and pa.abstract and pa.abstract[:1] not in "=(":
+                    article.abstract = pa.abstract
+                    if "pubmed" not in article.source.split("+"):
+                        article.source = "+".join(p for p in [article.source, "pubmed"] if p)
+            if not _needs_enrichment(article):
+                return article
+
             # 6. Scopus DOI lookup (last resort, requires API key)
             if scopus and article.doi and (not article.abstract or not article.keywords):
                 sa = scopus.fetch_by_doi(article.doi)
