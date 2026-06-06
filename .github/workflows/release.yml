@@ -1,8 +1,7 @@
 name: Generate ECLab News
-
 on:
   schedule:
-    - cron: "0 18 * * 1"  # Monday 18:00 UTC (~02:00 Tue CST)
+    - cron: "0 18 * * 1" # Monday 18:00 UTC (~02:00 Tue CST)
   release:
     types: [published]
   workflow_dispatch:
@@ -13,35 +12,27 @@ on:
       end:
         description: "End date YYYY-MM-DD (blank = past week)"
         required: false
-
 permissions:
   contents: write
-
 jobs:
   generate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
-
       - name: Install uv
-        uses: astral-sh/setup-uv@v8
-
+        uses: astral-sh/setup-uv@08807647e7069bb48b6ef5acd8ec9567f424441b
       - uses: actions/cache@v5
         with:
           path: ~/.cache/uv
           key: uv-${{ hashFiles('uv.lock') }}
           restore-keys: uv-
-
       - name: Install pandoc
         run: sudo apt-get update -qq && sudo apt-get install -y pandoc
-
       - name: Install package
         run: uv pip install --system -e .
-
       - name: Resolve date range
         id: dates
         env:
@@ -66,14 +57,13 @@ jobs:
           echo "start=$START" >> "$GITHUB_OUTPUT"
           echo "end=$END"     >> "$GITHUB_OUTPUT"
           echo "label=${START}_${END}" >> "$GITHUB_OUTPUT"
-
       - name: Run full pipeline
         env:
-          LLM_API_KEY:    ${{ secrets.LLM_API_KEY }}
-          LLM_API_BASE:   ${{ secrets.LLM_API_BASE }}
-          LLM_MODEL:      ${{ secrets.LLM_MODEL }}
-          NCBI_API_KEY:   ${{ secrets.NCBI_API_KEY }}
-          S2_API_KEY:     ${{ secrets.S2_API_KEY }}
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+          LLM_API_BASE: ${{ secrets.LLM_API_BASE }}
+          LLM_MODEL: ${{ secrets.LLM_MODEL }}
+          NCBI_API_KEY: ${{ secrets.NCBI_API_KEY }}
+          S2_API_KEY: ${{ secrets.S2_API_KEY }}
           SCOPUS_API_KEY: ${{ secrets.SCOPUS_API_KEY }}
         run: |
           eclab-news all \
@@ -81,7 +71,6 @@ jobs:
             --start "${{ steps.dates.outputs.start }}" \
             --end   "${{ steps.dates.outputs.end }}" \
             --output-dir .
-
       - name: Upload release assets
         if: github.event_name == 'release'
         env:
@@ -92,7 +81,6 @@ jobs:
             reports/*_lab.md \
             reports/*_lab.html \
             --clobber
-
       - name: Upload artifacts
         if: github.event_name != 'release'
         uses: actions/upload-artifact@v7
