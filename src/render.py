@@ -92,15 +92,19 @@ def render_wechat_markdown(
 ) -> str:
     lines = _wechat_header(config)
     lines.append("---")
+    lines.append("")
     for index, (category, articles) in enumerate(categories.items()):
         if index:
             lines.append("---")
+            lines.append("")
         lines.append(f"## 关键词：{category}")
+        lines.append("")
         for article in articles:
             lines.append(f"### {title(article)}")
             lines.append(f"**{value(article, 'authors', '作者信息缺失')}**")
             lines.append(f"*{publication_info(article)}*")
             lines.append(value(article, "summary", "摘要或总结缺失").replace("\n", "\n> "))
+            lines.append("")
     lines.extend(
         [
             "---",
@@ -132,16 +136,20 @@ def _wechat_header(config: AppConfig) -> list[str]:
     month = config.project.month or ""
     start = config.project.start_date
     end = config.project.end_date
-    full_url = config.project.wechat_full_version_url
     if start and end:
         date_display = f"{start.replace('-', '.').removeprefix(f'{year}.')}-{end.replace('-', '.').removeprefix(f'{year}.')}"
         title_line = f"# {config.project.name} {year}.{date_display}"
+        full_url = (
+            f"https://github.com/ZJU-ECLab/ECLab-News/releases/download/"
+            f"v{start}_{end}/journal_{start}_{end}_lab.html"
+        )
     else:
         title_line = f"# {config.project.name} {year}年{month}月刊".strip()
+        full_url = config.project.wechat_full_version_url or ""
     return [
         title_line,
         "![](https://emotionculturelab.com/wp-content/uploads/2024/09/e59bbee789874.png)",
-        "> 《东西情报》是**浙江大学情绪和文化实验室**所创办的、收集当月情绪心理学领域文章和最新科研进展的文献汇编。",
+        "> 《东西情报》是**浙江大学情绪和文化实验室**所创办的、收集每周情绪心理学领域文章和最新科研进展的文献汇编。",
         "> 每一期《东西情报》把不同文章划分为了情绪、文化、面孔、声音等多个关键词，并将文章总结梳理成简短的概要，旨在让读者用短时间了解当前情绪领域的最新成果和动向。",
         "> 通过系统而高效的知识整合，《东西情报》致力于搭建连接前沿科研与公众科普的桥梁，期待能为屏幕前的你带来帮助！",
         "> **《东西情报》完整版请点击下方链接获取。**",
