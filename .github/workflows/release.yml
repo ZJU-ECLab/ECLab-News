@@ -1,7 +1,7 @@
 name: Generate ECLab News
 on:
   schedule:
-    - cron: "0 18 * * 1" # Monday 18:00 UTC (~02:00 Tue CST)
+    - cron: "0 2 * * 2" # Tuesday 02:00 UTC (10:00 UTC+8)
   release:
     types: [created]
   workflow_dispatch:
