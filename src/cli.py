@@ -165,13 +165,13 @@ def _parse_date(value: str) -> date:
 
 
 def _random_accent_color() -> str:
-    """Generate a vivid, high-contrast accent color using HSL."""
+    """Generate a muted, comfortable accent color using HSL."""
     import random
     h = random.randint(0, 359)
     # Avoid yellow-green range (80-140°) which has poor contrast on white
     if 80 <= h <= 140:
         h = (h + 80) % 360
-    return f"hsl({h}, 65%, 35%)"
+    return f"hsl({h}, 40%, 48%)"
 
 
 def collect_articles(config: AppConfig, start: date, end: date, max_results: int) -> list[Article]:

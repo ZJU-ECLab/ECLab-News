@@ -32,14 +32,14 @@ $if(toc)$
   <div class="toc-title" id="toc-title">关键词 · Keywords</div>
   <div id="sidebar-controls">
     <div class="sidebar-pill-row" id="view-toggle">
+      <div class="pill-thumb" id="view-pill-thumb"></div>
       <button class="sidebar-pill active" data-view="keywords">关键词</button>
       <button class="sidebar-pill" data-view="journals">期刊</button>
     </div>
-    <div class="sidebar-switch-row">
-      <span class="switch-label">仅显示选中</span>
-      <button type="button" class="switch" id="hide-switch" role="switch" aria-checked="false">
-        <span class="switch-knob"></span>
-      </button>
+    <div class="sidebar-pill-row" id="hide-toggle">
+      <div class="pill-thumb" id="hide-pill-thumb"></div>
+      <button class="sidebar-pill active" data-hide="false">全部显示</button>
+      <button class="sidebar-pill" data-hide="true">仅显示选中</button>
     </div>
   </div>
   <nav id="toc-nav">
@@ -83,10 +83,14 @@ $endif$
     }, { passive: true });
   }
 
-  var tocTitle   = document.getElementById('toc-title');
-  var nav        = document.getElementById('toc-nav');
-  var viewPills  = document.querySelectorAll('#view-toggle .sidebar-pill');
-  var hideSwitch = document.getElementById('hide-switch');
+  var tocTitle    = document.getElementById('toc-title');
+  var nav         = document.getElementById('toc-nav');
+  var viewToggle  = document.getElementById('view-toggle');
+  var hideToggle  = document.getElementById('hide-toggle');
+  var viewPillThumb = document.getElementById('view-pill-thumb');
+  var hidePillThumb = document.getElementById('hide-pill-thumb');
+  var viewPills   = document.querySelectorAll('#view-toggle .sidebar-pill');
+  var hidePills   = document.querySelectorAll('#hide-toggle .sidebar-pill');
 
   var keywordSections = document.querySelectorAll('.index-section[data-view="keywords"]');
   var journalSections = document.querySelectorAll('.index-section[data-view="journals"]');
@@ -94,181 +98,273 @@ $endif$
   var currentView     = 'keywords';
   var currentCategory = null;
   var hideMode        = false;
+  var DETAILS_KEY     = '文献详情';
+  var REC_KEY         = '⭐ 推荐阅读';
 
-  var DETAILS_KEY = '文献详情';
+  // ── pill thumb animation ────────────────────────────────────────────────────
+  // Move the sliding thumb to the position of the active button
 
-  // Sliding indicator element (single moving highlight — no cascade)
-  var indicator = document.createElement('div');
-  indicator.className = 'toc-indicator';
-  var ul = null;            // current <ul> of links
-  var linkByKey = {};       // key -> <a>
-
-  // ── helpers ────────────────────────────────────────────────────────────────
-
-  function attr() { return currentView === 'keywords' ? 'data-category' : 'data-journal'; }
-
-  function activeSections() {
-    return currentView === 'keywords' ? keywordSections : journalSections;
+  function movePillThumb(thumb, activeBtn, row) {
+    if (!thumb || !activeBtn) return;
+    var rowRect = row.getBoundingClientRect();
+    var btnRect = activeBtn.getBoundingClientRect();
+    var x = btnRect.left - rowRect.left - 3; // 3 = padding
+    thumb.style.width  = btnRect.width + 'px';
+    thumb.style.transform = 'translateX(' + x + 'px)';
   }
 
-  function show(el) { el.style.display = ''; }
-  function hide(el) { el.style.display = 'none'; }
+  function initPillThumb(thumb, row, activeBtn) {
+    if (!thumb || !activeBtn) return;
+    thumb.classList.add('no-spring');
+    movePillThumb(thumb, activeBtn, row);
+    void thumb.offsetWidth;
+    thumb.classList.remove('no-spring');
+  }
 
-  // Show/hide every category-section inside the active view
-  function applyFilter() {
-    var filterCat = currentCategory === DETAILS_KEY ? null : currentCategory;
-    activeSections().forEach(function(view) {
-      view.querySelectorAll('.category-section').forEach(function(s) {
-        var key = s.getAttribute(attr());
-        var shouldShow = !hideMode || !filterCat || key === filterCat;
-        var wasHidden = s.style.display === 'none';
-        if (shouldShow) {
-          show(s);
-          if (wasHidden && !reduceMotion) {
-            s.classList.remove('fade-in');
-            void s.offsetWidth;
-            s.classList.add('fade-in');
-          }
-        } else {
-          hide(s);
-          s.classList.remove('fade-in');
-        }
+  // ── index panel fade ────────────────────────────────────────────────────────
+
+  function fadeSection(el, show) {
+    el.classList.remove('panel-fade-in', 'panel-fade-out');
+    if (show) {
+      el.style.display = '';
+      el.classList.add('panel-fade-in');
+    } else {
+      el.classList.add('panel-fade-out');
+      var duration = reduceMotion ? 0 : 200;
+      setTimeout(function() { el.style.display = 'none'; el.classList.remove('panel-fade-out'); }, duration);
+    }
+  }
+
+  // ── sidebar nav carousel ────────────────────────────────────────────────────
+  // Two <ul> tracks side-by-side inside a .nav-track; translate to reveal correct one.
+
+  var navTrack = null;
+  var kwUl = null;  // keywords ul
+  var jnUl = null;  // journals ul
+  var indicator = document.createElement('div');
+  indicator.className = 'toc-indicator';
+  var linkByKey = {};
+
+  function buildNavTrack() {
+    nav.innerHTML = '';
+    linkByKey = {};
+
+    navTrack = document.createElement('div');
+    navTrack.className = 'nav-track';
+
+    kwUl = buildNavList('keywords');
+    jnUl = buildNavList('journals');
+    navTrack.appendChild(kwUl);
+    navTrack.appendChild(jnUl);
+
+    // Indicator lives on whichever ul is active
+    activeNavUl().appendChild(indicator);
+
+    nav.appendChild(navTrack);
+
+    // Slide to correct position immediately (no animation)
+    navTrack.classList.add('no-spring');
+    updateNavTrackPosition();
+    void navTrack.offsetWidth;
+    navTrack.classList.remove('no-spring');
+
+    requestAnimationFrame(function() { moveIndicator(currentCategory, false); });
+  }
+
+  function buildNavList(view) {
+    var ul = document.createElement('ul');
+    ul.setAttribute('data-nav-view', view);
+    var a = view === 'keywords' ? 'data-category' : 'data-journal';
+    var viewSections = view === 'keywords' ? keywordSections : journalSections;
+
+    var seen = [];
+    viewSections.forEach(function(s) {
+      s.querySelectorAll('.category-section[' + a + ']').forEach(function(cs) {
+        var v = cs.getAttribute(a);
+        if (v && seen.indexOf(v) === -1) seen.push(v);
       });
     });
+    seen.sort(function(a, b) {
+      // Recommended always sorts first
+      if (a === REC_KEY) return -1;
+      if (b === REC_KEY) return 1;
+      return a.toLowerCase().localeCompare(b.toLowerCase());
+    });
+    // Details last
+    seen.push(DETAILS_KEY);
+
+    seen.forEach(function(cat) {
+      var li = document.createElement('li');
+      var link = document.createElement('a');
+      link.href = '#';
+      link.textContent = cat;
+      link.setAttribute('data-filter', cat);
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        onNavClick(cat);
+      });
+      li.appendChild(link);
+      ul.appendChild(li);
+      if (view === currentView) linkByKey[cat] = link;
+    });
+
+    return ul;
+  }
+
+  function activeNavUl() {
+    return currentView === 'keywords' ? kwUl : jnUl;
+  }
+
+  function updateNavTrackPosition() {
+    if (!navTrack) return;
+    navTrack.style.transform = currentView === 'keywords' ? 'translateX(0)' : 'translateX(-50%)';
+  }
+
+  function syncLinkByKey() {
+    // Rebuild linkByKey from the active ul
+    linkByKey = {};
+    var ul = activeNavUl();
+    if (!ul) return;
+    ul.querySelectorAll('a[data-filter]').forEach(function(a) {
+      linkByKey[a.getAttribute('data-filter')] = a;
+    });
+    // Move indicator to the active ul
+    activeNavUl().appendChild(indicator);
   }
 
   // ── sliding indicator ─────────────────────────────────────────────────────
 
   function moveIndicator(key, animate) {
     var link = key ? linkByKey[key] : null;
-    if (!link || !ul) {
-      indicator.style.opacity = '0';
-      return;
-    }
+    if (!link) { indicator.style.opacity = '0'; return; }
     var li = link.parentElement;
     if (!animate || reduceMotion) indicator.classList.add('no-anim');
     indicator.style.opacity = '1';
     indicator.style.transform = 'translateY(' + li.offsetTop + 'px)';
     indicator.style.height = li.offsetHeight + 'px';
-    if (!animate || reduceMotion) {
-      // force reflow then re-enable transition
-      void indicator.offsetWidth;
-      indicator.classList.remove('no-anim');
-    }
+    if (!animate || reduceMotion) { void indicator.offsetWidth; indicator.classList.remove('no-anim'); }
   }
 
-  function setActive(key, animateIndicator) {
+  function setActive(key, animate) {
     currentCategory = key;
-    nav.querySelectorAll('a[data-filter]').forEach(function(a) {
-      var on = a.getAttribute('data-filter') === key;
-      a.classList.toggle('active', on);
-      if (on) a.setAttribute('aria-current', 'location');
-      else a.removeAttribute('aria-current');
+    // Update links in both nav lists
+    [kwUl, jnUl].forEach(function(ul) {
+      if (!ul) return;
+      ul.querySelectorAll('a[data-filter]').forEach(function(a) {
+        var on = a.getAttribute('data-filter') === key;
+        a.classList.toggle('active', on);
+        if (on) a.setAttribute('aria-current', 'location'); else a.removeAttribute('aria-current');
+      });
     });
-    moveIndicator(key, animateIndicator !== false);
+    moveIndicator(key, animate !== false);
   }
 
-  // ── programmatic scroll handling ────────────────────────────────────────────
+  // ── filter ──────────────────────────────────────────────────────────────────
+
+  function applyFilter() {
+    var filterCat = (currentCategory === DETAILS_KEY) ? null : currentCategory;
+    activeSections().forEach(function(view) {
+      view.querySelectorAll('.category-section').forEach(function(s) {
+        var key = s.getAttribute(attr());
+        var shouldShow = !hideMode || !filterCat || key === filterCat;
+        var wasHidden = s.style.display === 'none';
+        if (shouldShow) {
+          s.style.display = '';
+          if (wasHidden && !reduceMotion) {
+            s.classList.remove('fade-in'); void s.offsetWidth; s.classList.add('fade-in');
+          }
+        } else { s.style.display = 'none'; s.classList.remove('fade-in'); }
+      });
+    });
+  }
+
+  // ── helpers ──────────────────────────────────────────────────────────────────
+
+  function attr() { return currentView === 'keywords' ? 'data-category' : 'data-journal'; }
+  function activeSections() { return currentView === 'keywords' ? keywordSections : journalSections; }
+
+  // ── programmatic scroll ────────────────────────────────────────────────────
 
   var programmatic = false;
   var settleTimer = null;
 
-  function scrollToKey(key) {
-    var target = null;
-    if (key === DETAILS_KEY) {
-      target = document.getElementById('文献详情');
-    } else {
-      var selector = '.category-section[' + attr() + '="' + CSS.escape(key) + '"]';
-      activeSections().forEach(function(view) {
-        if (!target) target = view.querySelector(selector);
-      });
-    }
-    if (!target) return;
-
-    if (reduceMotion) {
-      target.scrollIntoView({ block: 'start' });
-      return;
-    }
-
+  function scrollToTarget(el) {
+    if (!el) return;
+    if (reduceMotion) { el.scrollIntoView({ block: 'start' }); return; }
     programmatic = true;
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    // Clear programmatic flag when scrolling settles
-    var clear = function() {
-      programmatic = false;
-      window.removeEventListener('scrollend', clear);
-    };
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     if ('onscrollend' in window) {
-      window.addEventListener('scrollend', clear, { once: true });
+      window.addEventListener('scrollend', function() { programmatic = false; }, { once: true });
     }
-    // Fallback: settle timeout reset on each scroll tick
-    function onScrollSettle() {
+    function onSettle() {
       if (settleTimer) clearTimeout(settleTimer);
-      settleTimer = setTimeout(function() {
-        programmatic = false;
-        window.removeEventListener('scroll', onScrollSettle);
-      }, 140);
+      settleTimer = setTimeout(function() { programmatic = false; window.removeEventListener('scroll', onSettle); }, 140);
     }
-    window.addEventListener('scroll', onScrollSettle, { passive: true });
+    window.addEventListener('scroll', onSettle, { passive: true });
   }
 
-  // Cancel programmatic suppression the moment the user takes over
-  ['wheel', 'touchstart', 'keydown'].forEach(function(evt) {
-    window.addEventListener(evt, function() { programmatic = false; }, { passive: true });
+  function scrollToKey(key) {
+    if (key === DETAILS_KEY) { scrollToTarget(document.getElementById('文献详情')); return; }
+    var selector = '.category-section[' + attr() + '="' + CSS.escape(key) + '"]';
+    var found = null;
+    activeSections().forEach(function(v) { if (!found) found = v.querySelector(selector); });
+    scrollToTarget(found);
+  }
+
+  ['wheel', 'touchstart', 'keydown'].forEach(function(e) {
+    window.addEventListener(e, function() { programmatic = false; }, { passive: true });
   });
-
-  // ── sidebar build ───────────────────────────────────────────────────────────
-
-  function buildSidebar() {
-    nav.innerHTML = '';
-    linkByKey = {};
-    ul = document.createElement('ul');
-    ul.appendChild(indicator);
-
-    var seen = [];
-    activeSections().forEach(function(view) {
-      view.querySelectorAll('.category-section[' + attr() + ']').forEach(function(s) {
-        var v = s.getAttribute(attr());
-        if (v && seen.indexOf(v) === -1) seen.push(v);
-      });
-    });
-    seen.sort(function(a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
-
-    // 文献详情 is a normal tag, appended last
-    seen.push(DETAILS_KEY);
-
-    seen.forEach(function(cat) {
-      var li = document.createElement('li');
-      var a  = document.createElement('a');
-      a.href = '#';
-      a.textContent = cat;
-      a.setAttribute('data-filter', cat);
-      a.addEventListener('click', function(e) {
-        e.preventDefault();
-        onTagClick(cat);
-      });
-      li.appendChild(a);
-      ul.appendChild(li);
-      linkByKey[cat] = a;
-    });
-
-    nav.appendChild(ul);
-    // Position indicator without animation on (re)build
-    requestAnimationFrame(function() { moveIndicator(currentCategory, false); });
-  }
 
   // ── interactions ────────────────────────────────────────────────────────────
 
-  function onTagClick(cat) {
+  function onNavClick(cat) {
     if (hideMode && cat === currentCategory && cat !== DETAILS_KEY) {
-      // Toggle off — show all
-      setActive(null);
-      applyFilter();
-      return;
+      setActive(null); applyFilter(); return;
     }
     setActive(cat);
     if (cat !== DETAILS_KEY) applyFilter();
     scrollToKey(cat);
+  }
+
+  function switchView(view, onComplete) {
+    if (view === currentView) { if (onComplete) onComplete(); return; }
+    var oldSections = activeSections();
+
+    currentView = view;
+    var newSections = activeSections();
+
+    // Fade panels
+    oldSections.forEach(function(s) { fadeSection(s, false); });
+    newSections.forEach(function(s) {
+      fadeSection(s, true);
+      // Reset any category-sections hidden by a previous filter in this view
+      s.querySelectorAll('.category-section').forEach(function(cs) { cs.style.display = ''; });
+      s.querySelectorAll('.article-index-item').forEach(function(it) { it.style.display = ''; });
+    });
+
+    // Slide nav track
+    updateNavTrackPosition();
+    // Sync linkByKey to the new active ul
+    syncLinkByKey();
+
+    currentCategory = null;
+    hideMode = false;
+    // Reset hide pill thumb
+    var firstHideBtn = hidePills[0];
+    hidePills.forEach(function(b) { b.classList.toggle('active', b.getAttribute('data-hide') === 'false'); });
+    if (firstHideBtn) movePillThumb(hidePillThumb, firstHideBtn, hideToggle);
+
+    if (tocTitle) tocTitle.textContent = view === 'keywords' ? '关键词 · Keywords' : '期刊 · Journals';
+
+    setActive(null, false);
+
+    // Wait for the fade-out to remove old sections from layout before
+    // running scroll-dependent callbacks, so positions are stable.
+    var delay = reduceMotion ? 0 : 210;
+    setTimeout(function() {
+      if (onComplete) onComplete();
+      requestAnimationFrame(spy);
+    }, delay);
   }
 
   // View toggle
@@ -278,85 +374,111 @@ $endif$
       if (view === currentView) return;
       viewPills.forEach(function(b) { b.classList.remove('active'); });
       this.classList.add('active');
-
-      keywordSections.forEach(hide);
-      journalSections.forEach(hide);
-
-      currentView     = view;
-      currentCategory = null;
-      hideMode        = false;
-      if (hideSwitch) { hideSwitch.classList.remove('on'); hideSwitch.setAttribute('aria-checked', 'false'); }
-      if (tocTitle) tocTitle.textContent = view === 'keywords' ? '关键词 · Keywords' : '期刊 · Journals';
-
-      activeSections().forEach(function(s) {
-        show(s);
-        s.querySelectorAll('.category-section').forEach(show);
-      });
-
-      buildSidebar();
-      requestAnimationFrame(spy);
+      movePillThumb(viewPillThumb, this, viewToggle);
+      switchView(view);
     });
   });
 
-  // Hide-mode switch
-  if (hideSwitch) {
-    hideSwitch.addEventListener('click', function() {
-      hideMode = !hideMode;
-      this.classList.toggle('on', hideMode);
-      this.setAttribute('aria-checked', hideMode ? 'true' : 'false');
-      if (!hideMode) { setActive(null); }
+  // Hide-mode toggle
+  hidePills.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var wantHide = this.getAttribute('data-hide') === 'true';
+      if (wantHide === hideMode) return;
+      hidePills.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      movePillThumb(hidePillThumb, this, hideToggle);
+      hideMode = wantHide;
+      if (!hideMode) setActive(null);
       applyFilter();
-      if (hideMode && currentCategory) moveIndicator(currentCategory, false);
     });
-  }
+  });
 
-  // ── scroll-spy (suppressed during programmatic scroll) ──────────────────────
+  // ── scroll-spy ─────────────────────────────────────────────────────────────
 
   function spy() {
     if (programmatic || hideMode || !nav) return;
-    var line = 90; // active reference line from top of viewport
+    var line = 90;
     var a = attr();
     var current = null;
     activeSections().forEach(function(view) {
       view.querySelectorAll('.category-section[' + a + ']').forEach(function(s) {
-        if (s.style.display !== 'none' && s.getBoundingClientRect().top <= line) {
-          current = s.getAttribute(a);
-        }
+        if (s.style.display !== 'none' && s.getBoundingClientRect().top <= line) current = s.getAttribute(a);
       });
     });
-    // Details section
     var details = document.getElementById('文献详情');
     if (details && details.getBoundingClientRect().top <= line) current = DETAILS_KEY;
-    // Bottom of page → force last tag
-    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
-      current = DETAILS_KEY;
-    }
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) current = DETAILS_KEY;
     if (current !== currentCategory) setActive(current);
   }
   window.addEventListener('scroll', spy, { passive: true });
 
-  // Reposition indicator on resize / layout shifts
+  // ── clickable tags in article index ────────────────────────────────────────
+
+  document.querySelectorAll('.tag[data-tag]').forEach(function(tag) {
+    tag.addEventListener('click', function(e) {
+      e.preventDefault(); e.stopPropagation();
+      var tagValue = this.getAttribute('data-tag');
+      var isRec = this.classList.contains('tag-rec');
+      var isJournal = this.classList.contains('tag-journal');
+      // Recommended is cross-view → stay in current view; otherwise pick view by tag type
+      var targetView = isRec ? currentView : (isJournal ? 'journals' : 'keywords');
+
+      function activateAndScroll() {
+        setActive(tagValue);
+        if (hideMode) applyFilter();
+        scrollToKey(tagValue);
+      }
+
+      if (targetView !== currentView) {
+        // Move the view pill, then switch; scroll only after layout settles
+        viewPills.forEach(function(x) { x.classList.remove('active'); });
+        viewPills.forEach(function(b) {
+          if (b.getAttribute('data-view') === targetView) {
+            b.classList.add('active');
+            movePillThumb(viewPillThumb, b, viewToggle);
+          }
+        });
+        switchView(targetView, activateAndScroll);
+      } else {
+        activateAndScroll();
+      }
+    });
+  });
+
+  // ── ResizeObserver ──────────────────────────────────────────────────────────
+
   if (window.ResizeObserver) {
-    var ro = new ResizeObserver(function() { moveIndicator(currentCategory, false); });
-    ro.observe(nav);
+    new ResizeObserver(function() { moveIndicator(currentCategory, false); }).observe(nav);
   }
-  window.addEventListener('resize', function() { moveIndicator(currentCategory, false); });
+  window.addEventListener('resize', function() {
+    moveIndicator(currentCategory, false);
+    // Reposition pill thumbs
+    var activeView = Array.from(viewPills).find(function(b) { return b.classList.contains('active'); });
+    if (activeView) { viewPillThumb.classList.add('no-spring'); movePillThumb(viewPillThumb, activeView, viewToggle); void viewPillThumb.offsetWidth; viewPillThumb.classList.remove('no-spring'); }
+    var activeHide = Array.from(hidePills).find(function(b) { return b.classList.contains('active'); });
+    if (activeHide) { hidePillThumb.classList.add('no-spring'); movePillThumb(hidePillThumb, activeHide, hideToggle); void hidePillThumb.offsetWidth; hidePillThumb.classList.remove('no-spring'); }
+  });
 
   // ── init ────────────────────────────────────────────────────────────────────
 
-  buildSidebar();
+  buildNavTrack();
   requestAnimationFrame(spy);
+
+  // Initialize pill thumbs without animation
+  requestAnimationFrame(function() {
+    var av = Array.from(viewPills).find(function(b) { return b.classList.contains('active'); });
+    initPillThumb(viewPillThumb, viewToggle, av);
+    var ah = Array.from(hidePills).find(function(b) { return b.classList.contains('active'); });
+    initPillThumb(hidePillThumb, hideToggle, ah);
+  });
 
   // Wrap article detail cards
   document.querySelectorAll('a[id^="article-"]').forEach(function(anchor) {
     var p = anchor.parentElement;
     if (!p || p.tagName !== 'P') return;
     var card = document.createElement('div');
-    card.className = 'article-card';
-    card.id = anchor.id;
-    anchor.id = '';
-    p.parentNode.insertBefore(card, p);
-    p.remove();
+    card.className = 'article-card'; card.id = anchor.id; anchor.id = '';
+    p.parentNode.insertBefore(card, p); p.remove();
     var sibling = card.nextSibling;
     while (sibling) {
       var next = sibling.nextSibling;
@@ -364,26 +486,19 @@ $endif$
         (sibling.tagName === 'P' && sibling.querySelector('a[id^="article-"]')) ||
         sibling.tagName === 'H2'
       )) break;
-      card.appendChild(sibling);
-      sibling = next;
+      card.appendChild(sibling); sibling = next;
     }
     var ps = card.querySelectorAll('p');
     if (ps.length > 0) ps[ps.length - 1].classList.add('abstract');
   });
 
   // Mobile sidebar toggle
-  var toggle  = document.getElementById('toc-toggle');
+  var toggle = document.getElementById('toc-toggle');
   var sidebar = document.getElementById('toc-sidebar');
   var overlay = document.getElementById('toc-overlay');
   if (toggle && sidebar) {
-    toggle.addEventListener('click', function() {
-      sidebar.classList.toggle('open');
-      if (overlay) overlay.classList.toggle('open');
-    });
-    if (overlay) overlay.addEventListener('click', function() {
-      sidebar.classList.remove('open');
-      if (overlay) overlay.classList.remove('open');
-    });
+    toggle.addEventListener('click', function() { sidebar.classList.toggle('open'); if (overlay) overlay.classList.toggle('open'); });
+    if (overlay) overlay.addEventListener('click', function() { sidebar.classList.remove('open'); overlay.classList.remove('open'); });
   }
 })();
 </script>

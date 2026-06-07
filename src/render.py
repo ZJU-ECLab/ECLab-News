@@ -15,8 +15,11 @@ from .articles import (
     url,
     value,
 )
+from .category import upper_or_capitalize
 from .config import AppConfig
 from .csv_io import read_articles
+
+REC_LABEL = "⭐ 推荐阅读"
 
 
 def render_markdown(
@@ -54,62 +57,28 @@ def render_lab_markdown(
     # Keyword index
     lines.extend(['<div class="index-section" data-view="keywords">', ""])
     if recommended:
-        lines.extend(['<div class="category-section" data-category="⭐ 推荐阅读">', ""])
-        lines.extend(["### ⭐ 推荐阅读", ""])
-        for article in recommended:
-            anchor = anchors.get(id(article), "")
-            journal_name = value(article, "journal", "")
-            journal_prefix = f"*{journal_name}* · " if journal_name else ""
-            lines.append(f"- [{title(article)}](#{anchor})")
-            lines.append("")
-            lines.append(f"  {journal_prefix}{value(article, 'summary', '摘要或总结缺失')}")
-            lines.append("")
+        lines.extend([f'<div class="category-section" data-category="{REC_LABEL}">', ""])
+        lines.extend([f"### {REC_LABEL}", ""])
+        lines.extend(_render_article_list(recommended, anchors, rec_dois))
         lines.extend(["</div>", ""])
     for category, articles in categories.items():
         lines.extend([f'<div class="category-section" data-category="{category}">', ""])
         lines.extend([f"### 关键词：{category}", ""])
-        for article in articles:
-            anchor = anchors.get(id(article), "")
-            journal_name = value(article, "journal", "")
-            journal_prefix = f"*{journal_name}* · " if journal_name else ""
-            doi = value(article, "doi", "").lower()
-            is_rec = doi in rec_dois
-            star = " ⭐" if is_rec else ""
-            lines.append(f"- [{title(article)}](#{anchor}){star}")
-            lines.append("")
-            lines.append(f"  {journal_prefix}{value(article, 'summary', '摘要或总结缺失')}")
-            lines.append("")
+        lines.extend(_render_article_list(articles, anchors, rec_dois))
         lines.extend(["</div>", ""])
     lines.extend(["</div>", ""])
 
     # Journal index
     lines.extend(['<div class="index-section" data-view="journals" style="display:none">', ""])
     if recommended:
-        lines.extend(['<div class="category-section" data-journal="⭐ 推荐阅读">', ""])
-        lines.extend(["### ⭐ 推荐阅读", ""])
-        for article in recommended:
-            anchor = anchors.get(id(article), "")
-            journal_name = value(article, "journal", "")
-            journal_prefix = f"*{journal_name}* · " if journal_name else ""
-            lines.append(f"- [{title(article)}](#{anchor})")
-            lines.append("")
-            lines.append(f"  {journal_prefix}{value(article, 'summary', '摘要或总结缺失')}")
-            lines.append("")
+        lines.extend([f'<div class="category-section" data-journal="{REC_LABEL}">', ""])
+        lines.extend([f"### {REC_LABEL}", ""])
+        lines.extend(_render_article_list(recommended, anchors, rec_dois))
         lines.extend(["</div>", ""])
     for journal, articles in journal_categories.items():
         lines.extend([f'<div class="category-section" data-journal="{journal}">', ""])
         lines.extend([f"### 📖 {journal}", ""])
-        for article in articles:
-            anchor = anchors.get(id(article), "")
-            category_text = value(article, "category", "") or value(article, "matched_keywords", "")
-            category_prefix = f"*{category_text}* · " if category_text else ""
-            doi = value(article, "doi", "").lower()
-            is_rec = doi in rec_dois
-            star = " ⭐" if is_rec else ""
-            lines.append(f"- [{title(article)}](#{anchor}){star}")
-            lines.append("")
-            lines.append(f"  {category_prefix}{value(article, 'summary', '摘要或总结缺失')}")
-            lines.append("")
+        lines.extend(_render_article_list(articles, anchors, rec_dois))
         lines.extend(["</div>", ""])
     lines.extend(["</div>", ""])
 
@@ -140,6 +109,51 @@ def render_lab_markdown(
         )
 
     return "\n".join(lines).strip() + "\n"
+
+
+def _render_article_list(
+    articles: list[dict[str, str]],
+    anchors: dict[int, str],
+    rec_dois: set[str],
+) -> list[str]:
+    lines: list[str] = []
+    for article in articles:
+        anchor = anchors.get(id(article), "")
+        doi = value(article, "doi", "").lower()
+        is_rec = doi in rec_dois
+        journal_name = value(article, "journal", "")
+        category_text = value(article, "category", "") or value(article, "matched_keywords", "")
+        keywords = [upper_or_capitalize(k.strip()) for k in category_text.split(",") if k.strip()]
+        tags = _build_tags_html(is_rec, journal_name, keywords)
+        summary = value(article, "summary", "摘要或总结缺失")
+        rec_attr = ' data-recommended="true"' if is_rec else ""
+        lines.append("")
+        lines.append(f'<div class="article-index-item" data-anchor="{anchor}"{rec_attr}>')
+        lines.append(f'<div class="article-index-title"><a href="#{anchor}">{title(article)}</a></div>')
+        lines.append(f'<div class="article-index-tags">{tags}</div>')
+        lines.append(f'<div class="article-index-summary">{summary}</div>')
+        lines.append("</div>")
+        lines.append("")
+    return lines
+
+
+def _build_tags_html(is_rec: bool, journal: str, keywords: list[str]) -> str:
+    parts: list[str] = []
+    if is_rec:
+        parts.append('<span class="tag tag-rec" data-tag="⭐ 推荐阅读">⭐ 推荐阅读</span>')
+    if journal:
+        parts.append(f'<span class="tag tag-journal" data-tag="{_escape_attr(journal)}">{_escape_html(journal)}</span>')
+    for kw in keywords:
+        parts.append(f'<span class="tag tag-keyword" data-tag="{_escape_attr(kw)}">{_escape_html(kw)}</span>')
+    return "".join(parts)
+
+
+def _escape_html(text: str) -> str:
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def _escape_attr(text: str) -> str:
+    return _escape_html(text).replace('"', "&quot;")
 
 
 def render_wechat_markdown(
