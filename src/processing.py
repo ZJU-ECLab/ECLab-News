@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -130,9 +131,17 @@ def _keep_article(
     return True, ""
 
 
+_TRUNCATED_ABSTRACT_RE = re.compile(r'^[=<\(]')
+
+
 def _needs_enrichment(article: Article) -> bool:
     """Check if an article needs any enrichment at all."""
-    return not article.abstract or not article.keywords or not article.authors
+    return (
+        not article.abstract
+        or bool(_TRUNCATED_ABSTRACT_RE.match(article.abstract))
+        or not article.keywords
+        or not article.authors
+    )
 
 
 def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]:
@@ -205,10 +214,10 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
             if not _needs_enrichment(article):
                 return article
 
-            # 5c. Re-fetch truncated abstracts (start with = or ( — beginning lost)
-            if article.doi and article.abstract and article.abstract[:1] in "=(":
+            # 5c. Re-fetch truncated abstracts (start with = < ( — beginning lost)
+            if article.doi and article.abstract and _TRUNCATED_ABSTRACT_RE.match(article.abstract):
                 pa = pubmed.fetch_by_doi(article.doi, config)
-                if pa is not None and pa.abstract and pa.abstract[:1] not in "=(":
+                if pa is not None and pa.abstract and not _TRUNCATED_ABSTRACT_RE.match(pa.abstract):
                     article.abstract = pa.abstract
                     if "pubmed" not in article.source.split("+"):
                         article.source = "+".join(p for p in [article.source, "pubmed"] if p)
@@ -245,7 +254,11 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
 
 def _merge_missing(target: Article, incoming: Article) -> None:
     for field in Article.__dataclass_fields__:
-        if not str(getattr(target, field)).strip() and str(getattr(incoming, field)).strip():
+        target_val = str(getattr(target, field)).strip()
+        incoming_val = str(getattr(incoming, field)).strip()
+        if not target_val and incoming_val:
+            setattr(target, field, getattr(incoming, field))
+        elif field == "abstract" and incoming_val and _TRUNCATED_ABSTRACT_RE.match(target_val) and not _TRUNCATED_ABSTRACT_RE.match(incoming_val):
             setattr(target, field, getattr(incoming, field))
     if incoming.source and incoming.source not in target.source.split("+"):
         target.source = "+".join(part for part in [target.source, incoming.source] if part)
