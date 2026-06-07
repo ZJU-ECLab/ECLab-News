@@ -1,7 +1,7 @@
 from __future__ import annotations
 
+import json
 import os
-import re
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -83,7 +83,7 @@ def summarize_article(config: AppConfig, row: dict[str, str]) -> tuple[str, str,
         category=row.get("category", ""),
         abstract=row.get("abstract", ""),
     )
-    kwargs = {
+    kwargs: dict = {
         "model": model,
         "api_key": api_key,
         "temperature": config.llm.temperature,
@@ -95,48 +95,63 @@ def summarize_article(config: AppConfig, row: dict[str, str]) -> tuple[str, str,
     if api_base:
         kwargs["api_base"] = api_base
 
-    response = completion(**kwargs)
-    content = response.choices[0].message.content or ""
-    summary, category, recommended = _parse_response(content, config)
+    for attempt in range(2):
+        response = completion(**kwargs)
+        content = response.choices[0].message.content or ""
+        result = _parse_response(content, config)
+        if result is not None:
+            return result
+        # Ask the model to fix its output on the first failure
+        if attempt == 0:
+            kwargs["messages"] = kwargs["messages"] + [
+                {"role": "assistant", "content": content},
+                {"role": "user", "content": "输出格式有误，请重新输出：不相关时只输出数字 0，相关时只输出合法 JSON 对象。"},
+            ]
 
-    # Retry once if response looks valid but is missing CATEGORY line
-    if summary and summary != "0" and not category:
-        kwargs["messages"] = kwargs["messages"] + [
-            {"role": "assistant", "content": content},
-            {"role": "user", "content": '请在第一行补充分类标签，格式为 "CATEGORY: 标签1, 标签2"，然后重复原总结。'},
-        ]
-        retry_response = completion(**kwargs)
-        retry_content = retry_response.choices[0].message.content or ""
-        retry_summary, retry_category, retry_recommended = _parse_response(retry_content, config)
-        if retry_category:
-            return retry_summary, retry_category, retry_recommended or recommended
+    return "0", "", ""
+
+
+def _parse_response(content: str, config: AppConfig) -> tuple[str, str, str] | None:
+    """Parse a JSON response from the LLM.
+
+    Returns (summary, category, recommended) or None if the JSON is invalid
+    or missing required fields.
+    """
+    text = content.strip()
+    if text == "0":
+        return "0", "", ""
+
+    # Strip markdown code fences if the model wraps the JSON
+    if text.startswith("```"):
+        text = "\n".join(
+            line for line in text.splitlines()
+            if not line.startswith("```")
+        ).strip()
+
+    try:
+        data = json.loads(text)
+    except (json.JSONDecodeError, ValueError):
+        return None
+
+    if not isinstance(data, dict):
+        return None
+
+    relevant = str(data.get("relevant", "true")).strip().lower()
+    if relevant == "false" or str(data.get("summary", "")).strip() == "0":
+        return "0", "", ""
+
+    summary = str(data.get("summary", "")).strip()
+    if not summary:
+        return None
+
+    raw_categories = data.get("category", "")
+    if isinstance(raw_categories, list):
+        raw_categories = ", ".join(str(c) for c in raw_categories)
+    category = _clean_categories(str(raw_categories), config)
+
+    recommended = "true" if str(data.get("recommended", "")).strip().lower() == "true" else ""
 
     return summary, category, recommended
-
-
-def _parse_response(content: str, config: AppConfig) -> tuple[str, str, str]:
-    """Returns (summary, corrected_category, recommended)."""
-    stripped = content.strip()
-    if stripped == "0":
-        return "0", "", ""
-
-    category = ""
-    recommended = ""
-    summary_lines: list[str] = []
-    for line in stripped.splitlines():
-        m = re.match(r"\s*CATEGORY\s*[:：]\s*(.*)", line, re.IGNORECASE)
-        if m and not summary_lines:
-            category = _clean_categories(m.group(1), config)
-            continue
-        if re.match(r"\s*RECOMMENDED\s*[:：]\s*yes", line, re.IGNORECASE) and not summary_lines:
-            recommended = "true"
-            continue
-        summary_lines.append(line)
-
-    summary = " ".join(" ".join(summary_lines).split())
-    if summary == "0":
-        return "0", "", ""
-    return (summary or "0"), category, recommended
 
 
 def _clean_categories(raw: str, config: AppConfig) -> str:

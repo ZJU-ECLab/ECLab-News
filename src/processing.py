@@ -295,6 +295,7 @@ def _merge_missing(target: Article, incoming: Article) -> None:
 def _refresh_derived_fields(article: Article, config: AppConfig) -> None:
     article.journal = canonical_journal(article.journal, config.search.journals)
     article.publish_info = publish_info(article.volume, article.issue, article.publish_date)
+    article.keywords = _clean_keywords(article.keywords)
     article.matched_keywords = matched_terms(
         article.title, article.abstract, article.keywords, config.search.keywords
     )
@@ -305,3 +306,20 @@ def _refresh_derived_fields(article: Article, config: AppConfig) -> None:
         article.matched_keywords,
         config.categories,
     ) or article.matched_keywords
+
+
+# OpenAlex concept tags often carry disambiguation qualifiers in parentheses,
+# e.g. "Dominance (genetics)", "SIGNAL (programming language)",
+# "Pattern recognition (psychology)". Drop the parenthetical entirely.
+_PAREN_QUALIFIER_RE = re.compile(r"\s*\([^)]*\)")
+
+
+def _clean_keywords(keywords: str) -> str:
+    if not keywords:
+        return keywords
+    cleaned = []
+    for kw in keywords.split(";"):
+        kw = _PAREN_QUALIFIER_RE.sub("", kw).strip()
+        if kw:
+            cleaned.append(kw)
+    return "; ".join(cleaned)
