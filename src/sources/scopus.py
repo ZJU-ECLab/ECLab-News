@@ -1,95 +1,97 @@
 from __future__ import annotations
 
 import os
-
-import httpx
+import threading
 
 from ..models import Article, clean_abstract, clean_cell
-from .common import doi_to_url, join_people, publish_info, http_retry
+from .common import doi_to_url, join_people, publish_info
 
-SCOPUS_ABSTRACT_URL = "https://api.elsevier.com/content/abstract/doi/{doi}"
+_init_lock = threading.Lock()
+_initialized = False
 
 
+def _ensure_init() -> None:
+    global _initialized
+    if _initialized:
+        return
+    with _init_lock:
+        if _initialized:
+            return
+        import pybliometrics
+        api_key = os.getenv("SCOPUS_API_KEY", "")
+        if not api_key:
+            raise RuntimeError("SCOPUS_API_KEY environment variable is not set.")
+        pybliometrics.init(keys=[api_key])
+        _initialized = True
 
 
 class ScopusClient:
     def __init__(self) -> None:
-        api_key = os.getenv("SCOPUS_API_KEY", "")
-        if not api_key:
-            raise RuntimeError("SCOPUS_API_KEY environment variable is not set.")
-        self.client = httpx.Client(
-            timeout=45,
-            headers={"Accept": "application/json", "X-ELS-APIKey": api_key},
-        )
+        _ensure_init()
 
     def close(self) -> None:
-        self.client.close()
+        pass
 
     def fetch_by_doi(self, doi: str) -> Article | None:
         if not doi:
             return None
-        try:
-            payload = self._get_json(SCOPUS_ABSTRACT_URL.format(doi=doi))
-        except httpx.HTTPStatusError as exc:
-            if exc.response.status_code in (400, 401, 403, 404):
-                return None
-            raise
-        return _payload_to_article(payload)
-
-    @http_retry
-    def _get_json(self, url: str) -> dict:
-        response = self.client.get(url)
-        response.raise_for_status()
-        return response.json()
+        article = _fetch_scopus(doi)
+        if article:
+            return article
+        if doi.startswith("10.1016/"):
+            return _fetch_sciencedirect(doi)
+        return None
 
 
-def _payload_to_article(payload: dict) -> Article:
-    core = payload.get("abstracts-retrieval-response", {})
-    item = core.get("item", {})
-    bibrecord = item.get("bibrecord", {})
-    head = bibrecord.get("head", {})
-    citation_info = head.get("citation-info", {})
-    source = head.get("source", {})
+def _fetch_scopus(doi: str) -> Article | None:
+    try:
+        from pybliometrics.scopus import AbstractRetrieval
+        ab = AbstractRetrieval(doi, id_type="doi", view="META_ABS")
+    except Exception:
+        return None
+    abstract = clean_abstract(ab.abstract or ab.description or "")
+    if not abstract:
+        return None
+    return _scopus_to_article(ab, abstract)
 
-    title = clean_cell(
-        (head.get("citation-title") or "")
-        or _nested(core, "coredata", "dc:title", default="")
-    )
-    abstract = clean_abstract(
-        _nested(core, "coredata", "dc:description", default="")
-        or str(head.get("abstracts") or "")
-    )
 
-    authors_raw = head.get("author-group") or []
-    if isinstance(authors_raw, dict):
-        authors_raw = [authors_raw]
-    names: list[str] = []
-    for group in authors_raw:
-        for author in _as_list(group.get("author") or []):
-            given = clean_cell(str(author.get("ce:given-name", "") or ""))
-            surname = clean_cell(str(author.get("ce:surname", "") or ""))
-            names.append(" ".join(p for p in [given, surname] if p))
+def _fetch_sciencedirect(doi: str) -> Article | None:
+    try:
+        from pybliometrics.sciencedirect import ArticleRetrieval
+        ar = ArticleRetrieval(doi, id_type="doi", view="META_ABS")
+    except Exception:
+        return None
+    abstract = clean_abstract(ar.abstract or "")
+    if not abstract:
+        return None
+    return _sciencedirect_to_article(ar, abstract)
+
+
+def _scopus_to_article(ab, abstract: str) -> Article | None:
+    title = clean_cell(ab.title or "")
+    if not title:
+        return None
+
+    authors_raw = ab.authors or []
+    names = []
+    for a in authors_raw:
+        parts = [p for p in [a.given_name, a.surname] if p]
+        if parts:
+            names.append(" ".join(parts))
     authors = join_people(names)
 
-    keywords_raw = _nested(core, "authkeywords", "author-keyword", default=[])
-    if isinstance(keywords_raw, dict):
-        keywords_raw = [keywords_raw]
-    keywords = clean_cell("; ".join(
-        str(kw.get("$", "") if isinstance(kw, dict) else kw)
-        for kw in _as_list(keywords_raw)
-    ))
-
-    doi = clean_cell(_nested(core, "coredata", "prism:doi", default=""))
-    volume = clean_cell(str(source.get("volisspag", {}).get("voliss", {}).get("@volume", "") or ""))
-    issue = clean_cell(str(source.get("volisspag", {}).get("voliss", {}).get("@issue", "") or ""))
-    pub_date = clean_cell(_nested(core, "coredata", "prism:coverDate", default=""))
-    journal_name = clean_cell(str(source.get("sourcetitle", "") or ""))
-    eid = clean_cell(_nested(core, "coredata", "eid", default=""))
+    keywords = clean_cell("; ".join(ab.authkeywords or []))
+    doi = clean_cell(ab.doi or "")
+    volume = clean_cell(ab.volume or "")
+    issue = clean_cell(ab.issueIdentifier or "")
+    pub_date = clean_cell(ab.coverDate or "")
+    journal = clean_cell(ab.publicationName or "")
+    eid = clean_cell(ab.eid or "")
 
     return Article(
         title=title,
         authors=authors,
-        journal=journal_name,
+        journal=journal,
         volume=volume,
         issue=issue,
         publish_date=pub_date,
@@ -103,17 +105,35 @@ def _payload_to_article(payload: dict) -> Article:
     )
 
 
-def _nested(d: dict, *keys: str, default: object = "") -> object:
-    for key in keys:
-        if not isinstance(d, dict):
-            return default
-        d = d.get(key, {})
-    return d if d != {} else default
+def _sciencedirect_to_article(ar, abstract: str) -> Article | None:
+    title = clean_cell(ar.title or "")
+    if not title:
+        return None
 
+    authors_raw = ar.authors or []
+    names = []
+    for a in authors_raw:
+        parts = [p for p in [a.given_name, a.surname] if p]
+        if parts:
+            names.append(" ".join(parts))
+    authors = join_people(names)
 
-def _as_list(value: object) -> list:
-    if isinstance(value, list):
-        return value
-    if value:
-        return [value]
-    return []
+    doi = clean_cell(ar.doi or "")
+    pub_date = clean_cell(ar.coverDate or "")
+    journal = clean_cell(ar.publicationName or "")
+    eid = clean_cell(ar.eid or "")
+    volume = clean_cell(str(ar.volume or ""))
+
+    return Article(
+        title=title,
+        authors=authors,
+        journal=journal,
+        volume=volume,
+        publish_date=pub_date,
+        publish_info=publish_info(volume, "", pub_date),
+        doi=doi,
+        url=doi_to_url(doi),
+        abstract=abstract,
+        source="scopus",
+        source_id=eid,
+    )
