@@ -17,8 +17,9 @@ Chinese summaries from abstracts, and renders Markdown/HTML reports.
 2. `eclab-news collect`
    Fetches articles per journal using the configured source (PubMed or Crossref,
    per `journal_sources`). Applies structural filters (journal, date, supplemental),
-   deduplicates, enriches missing fields from multiple APIs (fast sources first:
-   Crossref → OpenAlex → Semantic Scholar → PubMed → Scopus), then runs a strict
+   deduplicates, enriches missing fields from multiple APIs (PubMed → Crossref →
+   Springer → OpenAlex → Semantic Scholar → PubMed title search → OpenAlex title
+   search → Scopus → HTML landing-page fallback), then runs a strict
    relevance filter. Writes CSV.
 
 3. `eclab-news summarize`
@@ -50,7 +51,7 @@ Chinese summaries from abstracts, and renders Markdown/HTML reports.
 - `src/journals.py`: journal name/ISSN matching and supplemental checks.
 - `src/category.py`: keyword-based category inference.
 - `src/relevance.py`: basic psychology-relevance heuristic.
-- `src/sources/`: API clients (crossref, pubmed, openalex, semanticscholar, scopus, common).
+- `src/sources/`: API clients (crossref, pubmed, openalex, semanticscholar, scopus, springer, common) and `abstract_fallback.py` (HTML landing-page abstract recovery).
 - `pandoc/template.html`: pandoc HTML template with TOC and watermark.
 - `pandoc/theme.css`: CSS theme (accent-color-driven).
 

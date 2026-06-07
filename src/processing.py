@@ -12,6 +12,7 @@ from .journals import canonical_journal, is_configured_journal, looks_supplement
 from .models import Article
 from .relevance import is_psychology_relevant
 from .sources.common import date_in_range, matched_terms, publish_info
+from .sources.abstract_fallback import recover_missing_abstract
 from .sources.crossref import CrossrefClient
 from .sources.openalex import OpenAlexClient
 from .sources.pubmed import PubMedClient
@@ -239,6 +240,16 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
                 sa = scopus.fetch_by_doi(article.doi)
                 if sa is not None:
                     _merge_missing(article, sa)
+
+            # 10. HTML landing-page fallback for journals whose abstracts are
+            #     absent from all metadata APIs (e.g. APA, Taylor & Francis).
+            if not article.abstract and (article.doi or len(article.title) >= 20):
+                result = recover_missing_abstract(article)
+                if result is not None:
+                    article.abstract = result.abstract
+                    print(f"\n  Recovered abstract via {result.method} from {result.source_url}")
+                    if "html_fallback" not in article.source.split("+"):
+                        article.source = "+".join(p for p in [article.source, "html_fallback"] if p)
         except Exception:
             # Return article as-is if enrichment fails (e.g. API rate limit)
             return article
