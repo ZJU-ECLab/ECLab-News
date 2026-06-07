@@ -16,7 +16,7 @@ from ..models import Article, clean_abstract, clean_cell
 from .common import date_in_range, doi_to_url, http_retry, join_people, matched_terms, publish_info
 
 CROSSREF_WORKS_URL = "https://api.crossref.org/works"
-_SEARCH_WORKERS = 10
+_SEARCH_WORKERS = 3
 
 
 class CrossrefClient:
@@ -45,9 +45,9 @@ class CrossrefClient:
         def _fetch(idx: int, task: tuple[str, list[str]]) -> tuple[int, list[Article]]:
             journal, issns = task
             client = httpx.Client(timeout=45, headers=self._headers)
+            result = []
+            cursor = "*"
             try:
-                result = []
-                cursor = "*"
                 while True:
                     items, next_cursor = _search_page(client, self.email, "", journal, issns, start, end, rows=100, cursor=cursor)
                     new_count = 0
@@ -61,12 +61,16 @@ class CrossrefClient:
                         print(f"\rCollecting Crossref: {counter[0]} articles", end="", flush=True)
                     if not items or not next_cursor or next_cursor == cursor:
                         break
+                    if max_results and len(result) >= max_results:
+                        break
                     cursor = next_cursor
-                return idx, result
-            except Exception:
-                return idx, []
+            except Exception as exc:
+                import sys
+                print(f"\n  Warning: Crossref fetch for '{journal}' failed ({type(exc).__name__}: {exc}); "
+                      f"keeping {len(result)} articles collected so far", file=sys.stderr)
             finally:
                 client.close()
+            return idx, result
 
         with ThreadPoolExecutor(max_workers=_SEARCH_WORKERS) as pool:
             futures = [pool.submit(_fetch, i, t) for i, t in enumerate(tasks)]
@@ -168,6 +172,7 @@ class CrossrefClient:
         return response.json()
 
 
+@http_retry
 def _search_page(
     client: httpx.Client,
     email: str,
@@ -199,13 +204,10 @@ def _search_page(
         params["query.container-title"] = journal
     if email:
         params["mailto"] = email
-    try:
-        response = client.get(CROSSREF_WORKS_URL, params=params)
-        response.raise_for_status()
-        message = response.json().get("message", {})
-        return message.get("items", []), message.get("next-cursor", "")
-    except Exception:
-        return [], ""
+    response = client.get(CROSSREF_WORKS_URL, params=params)
+    response.raise_for_status()
+    message = response.json().get("message", {})
+    return message.get("items", []), message.get("next-cursor", "")
 
 
 def collect_crossref(config: AppConfig, start: date, end: date, max_results: int = 500) -> list[Article]:

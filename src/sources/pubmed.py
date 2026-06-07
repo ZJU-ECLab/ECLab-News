@@ -42,6 +42,9 @@ class PubMedClient:
         root = self._fetch_xml(ids)
         articles = [self._pubmed_article_to_article(node, config, start, end) for node in root.findall(".//PubmedArticle")]
         collected = [article for article in articles if article is not None]
+        # Sort deterministically so that the max_results trim is stable
+        collected.sort(key=lambda a: (a.doi or a.title).casefold())
+        collected = collected[:max_results]
         print(f"\rCollecting PubMed: {len(collected)} target articles", flush=True)
         return collected
 
@@ -66,12 +69,15 @@ class PubMedClient:
         return self._pubmed_article_to_article_without_date_filter(node, config)
 
     def _search_ids(self, term: str, max_results: int) -> list[str]:
+        # Request more than needed to avoid truncation instability from
+        # PubMed's non-deterministic tie-breaking on equal dates.
+        buffered_max = int(max_results * 1.5) + 10
         params = self._base_params(
             {
                 "db": "pubmed",
                 "term": term,
                 "retmode": "json",
-                "retmax": str(max_results),
+                "retmax": str(buffered_max),
                 "sort": "pub date",
             }
         )
