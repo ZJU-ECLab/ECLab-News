@@ -4,7 +4,7 @@ import os
 
 import httpx
 
-from ..models import Article, clean_cell
+from ..models import Article, clean_abstract, clean_cell
 from .common import doi_to_url, join_people, publish_info, http_retry
 
 S2_PAPER_URL = "https://api.semanticscholar.org/graph/v1/paper/DOI:{doi}"
@@ -60,7 +60,7 @@ def _payload_to_article(payload: dict) -> Article:
         publish_info=publish_info(volume, "", pub_date),
         doi=doi,
         url=doi_to_url(doi),
-        abstract=clean_cell(payload.get("abstract", "") or ""),
+        abstract=clean_abstract(payload.get("abstract", "") or ""),
         keywords=clean_cell("; ".join(payload.get("fieldsOfStudy") or [])),
         source="semanticscholar",
         source_id=clean_cell(payload.get("paperId", "")),

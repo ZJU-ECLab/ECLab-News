@@ -13,7 +13,7 @@ from tenacity import retry_if_exception, stop_after_attempt, wait_exponential
 from ..category import infer_categories
 from ..config import AppConfig
 from ..journals import article_matches_configured_journal, issns_for_journal, looks_supplemental
-from ..models import Article, clean_cell
+from ..models import Article, clean_abstract, clean_cell
 from .common import date_in_range, doi_to_url, http_retry, join_people, matched_terms, publish_info
 
 CROSSREF_WORKS_URL = "https://api.crossref.org/works"
@@ -102,7 +102,7 @@ class CrossrefClient:
         if not date_in_range(publish_date, start, end):
             return None
 
-        abstract = clean_cell(_strip_crossref_abstract(item.get("abstract", "")))
+        abstract = clean_abstract(_strip_crossref_abstract(item.get("abstract", "")))
         keywords = clean_cell("; ".join(item.get("subject", []) or []))
         volume = clean_cell(item.get("volume", ""))
         issue = clean_cell(item.get("issue", ""))
@@ -139,7 +139,7 @@ class CrossrefClient:
             return article
         item = payload.get("message", {})
         if not article.abstract:
-            article.abstract = clean_cell(_strip_crossref_abstract(item.get("abstract", "")))
+            article.abstract = clean_abstract(_strip_crossref_abstract(item.get("abstract", "")))
         if not article.keywords:
             article.keywords = clean_cell("; ".join(item.get("subject", []) or []))
         if not article.authors:

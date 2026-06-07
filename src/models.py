@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import asdict, dataclass
 
 
@@ -58,11 +59,24 @@ def clean_cell(value: object) -> str:
     return (
         text.replace("\r", " ")
         .replace("\n", " ")
-        .replace("’", "'")
-        .replace("‘", "'")
-        .replace("“", '"')
-        .replace("”", '"')
-        .replace("–", "-")
+        .replace("\u2019", "'")
+        .replace("\u2018", "'")
+        .replace("\u201c", '"')
+        .replace("\u201d", '"')
+        .replace("\u2013", "-")
         .strip()
     )
+
+
+_PSYCINFO_SUFFIX_RE = re.compile(
+    r"\s*\(PsycInfo Database Record \(c\) \d{4} APA, all rights reserved\)\.?\s*$"
+)
+_ABSTRACT_PREFIX_RE = re.compile(r"(?i:Abstract)\s*[:\-]?\s*(?=[A-Z])")
+
+
+def clean_abstract(value: object) -> str:
+    text = clean_cell(value)
+    text = _PSYCINFO_SUFFIX_RE.sub("", text)
+    text = _ABSTRACT_PREFIX_RE.sub("", text)
+    return text
 

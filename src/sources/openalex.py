@@ -4,7 +4,7 @@ from urllib.parse import quote
 
 import httpx
 
-from ..models import Article, clean_cell
+from ..models import Article, clean_abstract, clean_cell
 from .common import doi_to_url, http_retry, join_people, publish_info
 
 OPENALEX_WORK_URL = "https://api.openalex.org/works/{doi_url}"
@@ -82,7 +82,7 @@ def _payload_to_article(payload: dict) -> Article:
         publish_info=publish_info(volume, issue, publish_date),
         doi=doi,
         url=doi_to_url(doi) or clean_cell(payload.get("id", "")),
-        abstract=clean_cell(_abstract_from_inverted_index(payload.get("abstract_inverted_index"))),
+        abstract=clean_abstract(_abstract_from_inverted_index(payload.get("abstract_inverted_index"))),
         keywords=clean_cell("; ".join(_concept_names(payload))),
         source="openalex",
         source_id=clean_cell(payload.get("id", "")),

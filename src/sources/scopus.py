@@ -4,7 +4,7 @@ import os
 
 import httpx
 
-from ..models import Article, clean_cell
+from ..models import Article, clean_abstract, clean_cell
 from .common import doi_to_url, join_people, publish_info, http_retry
 
 SCOPUS_ABSTRACT_URL = "https://api.elsevier.com/content/abstract/doi/{doi}"
@@ -55,7 +55,7 @@ def _payload_to_article(payload: dict) -> Article:
         (head.get("citation-title") or "")
         or _nested(core, "coredata", "dc:title", default="")
     )
-    abstract = clean_cell(
+    abstract = clean_abstract(
         _nested(core, "coredata", "dc:description", default="")
         or str(head.get("abstracts") or "")
     )

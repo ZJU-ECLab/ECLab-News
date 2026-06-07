@@ -10,7 +10,7 @@ import httpx
 from ..category import infer_categories
 from ..config import AppConfig
 from ..journals import article_matches_configured_journal, issns_for_journal
-from ..models import Article, clean_cell
+from ..models import Article, clean_abstract, clean_cell
 from .common import date_in_range, doi_to_url, join_people, matched_terms, publish_info, http_retry
 
 ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
@@ -148,7 +148,7 @@ class PubMedClient:
     ) -> Article | None:
         title = clean_cell(_text(article_node.find("ArticleTitle")))
 
-        abstract = clean_cell(" ".join(_text(item) for item in article_node.findall("Abstract/AbstractText")))
+        abstract = clean_abstract(" ".join(_text(item) for item in article_node.findall("Abstract/AbstractText")))
         if config.search.require_abstract and not abstract:
             return None
         keywords = clean_cell("; ".join(_text(item) for item in medline.findall("KeywordList/Keyword")) if medline is not None else "")
