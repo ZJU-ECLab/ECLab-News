@@ -18,11 +18,14 @@ $endfor$
 <div id="progress-bar"></div>
 
 <header id="eclab-header">
-  <div class="header-logo-wrap">
-    <img class="header-logo-img" src="https://emotionculturelab.com/wp-content/uploads/2024/09/e59bbee789874.png" alt="ECLab Logo" onerror="this.style.display='none'" />
+  <div class="header-gradient-band"></div>
+  <div class="header-content">
+    <div class="header-logo-wrap">
+      <img class="header-logo-img" src="https://emotionculturelab.com/wp-content/uploads/2024/09/e59bbee789874.png" alt="ECLab Logo" onerror="this.style.display='none'" />
+    </div>
+    <h1>$if(title)$$title$$else$东西情报$endif$</h1>
+    <p class="subtitle">浙江大学情绪和文化实验室 · Emotion &amp; Culture Lab, Zhejiang University</p>
   </div>
-  <h1>$if(title)$$title$$else$东西情报$endif$</h1>
-  <p class="subtitle">浙江大学情绪和文化实验室 · Emotion &amp; Culture Lab, Zhejiang University</p>
 </header>
 
 <div id="page-wrapper">
@@ -57,6 +60,7 @@ $body$
 $if(toc)$
 <button id="toc-toggle" aria-label="Toggle table of contents">☰</button>
 $endif$
+
 
 <footer id="eclab-footer">
   <div class="footer-inner">
@@ -108,7 +112,7 @@ $endif$
     if (!thumb || !activeBtn) return;
     var rowRect = row.getBoundingClientRect();
     var btnRect = activeBtn.getBoundingClientRect();
-    var x = btnRect.left - rowRect.left - 3; // 3 = padding
+    var x = btnRect.left - rowRect.left - 3; // 3 = row padding, matches thumb left
     thumb.style.width  = btnRect.width + 'px';
     thumb.style.transform = 'translateX(' + x + 'px)';
   }
@@ -228,8 +232,14 @@ $endif$
     ul.querySelectorAll('a[data-filter]').forEach(function(a) {
       linkByKey[a.getAttribute('data-filter')] = a;
     });
-    // Move indicator to the active ul
+    // Move indicator to the active ul — reset position without animation
+    // so it doesn't slide from the old ul's position
+    indicator.classList.add('no-anim');
+    indicator.style.opacity = '0';
+    indicator.style.transform = 'translateY(0)';
     activeNavUl().appendChild(indicator);
+    void indicator.offsetWidth;
+    indicator.classList.remove('no-anim');
   }
 
   // ── sliding indicator ─────────────────────────────────────────────────────
