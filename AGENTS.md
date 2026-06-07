@@ -28,7 +28,9 @@ Chinese summaries from abstracts, and renders Markdown/HTML reports.
 
 4. `eclab-news render`
    Generates Markdown.
-   - `--variant lab`: linked index by keyword, then detailed article records.
+   - `--variant lab`: linked index with tabs to switch between keyword and journal
+     views, recommended articles section, and detailed article records. Supports
+     interactive filtering in HTML output via sidebar categories.
    - `--variant wechat`: compact format without extra blank lines after headings.
 
 5. `eclab-news pandoc`

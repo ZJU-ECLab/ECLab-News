@@ -29,9 +29,20 @@ $endfor$
 
 $if(toc)$
 <aside id="toc-sidebar">
-  <div class="toc-title">关键词 · Keywords</div>
+  <div class="toc-title" id="toc-title">关键词 · Keywords</div>
+  <div id="sidebar-controls">
+    <div class="sidebar-pill-row" id="view-toggle">
+      <button class="sidebar-pill active" data-view="keywords">关键词</button>
+      <button class="sidebar-pill" data-view="journals">期刊</button>
+    </div>
+    <div class="sidebar-switch-row">
+      <span class="switch-label">仅显示选中</span>
+      <button type="button" class="switch" id="hide-switch" role="switch" aria-checked="false">
+        <span class="switch-knob"></span>
+      </button>
+    </div>
+  </div>
   <nav id="toc-nav">
-  $toc$
   </nav>
 </aside>
 <div id="toc-overlay"></div>
@@ -61,67 +72,283 @@ $endif$
 
 <script>
 (function() {
-  // Scroll progress bar
-  var progressBar = document.getElementById('progress-bar');
-  if (progressBar) {
-    function updateProgress() {
-      var scrollTop = window.scrollY;
-      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      var pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      progressBar.style.width = pct + '%';
-    }
-    window.addEventListener('scroll', updateProgress, { passive: true });
-    updateProgress();
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Progress bar
+  var pb = document.getElementById('progress-bar');
+  if (pb) {
+    window.addEventListener('scroll', function() {
+      var h = document.documentElement.scrollHeight - window.innerHeight;
+      pb.style.width = (h > 0 ? window.scrollY / h * 100 : 0) + '%';
+    }, { passive: true });
   }
 
-  // Flatten TOC: extract keyword items, remove索引/文献详情 wrappers, strip prefix
-  var nav = document.getElementById('toc-nav');
-  if (nav) {
-    var topUl = nav.querySelector('ul');
-    if (topUl) {
-      var items = [];
-      // Walk top-level li items
-      var topLis = Array.from(topUl.querySelectorAll(':scope > li'));
-      topLis.forEach(function(li) {
-        var subUl = li.querySelector(':scope > ul');
-        if (subUl) {
-          // Has children — extract keyword items from nested list
-          var subLis = subUl.querySelectorAll(':scope > li');
-          subLis.forEach(function(subLi) {
-            var subA = subLi.querySelector(':scope > a');
-            if (subA && subA.textContent.indexOf('关键词') !== -1) {
-              // Strip "关键词：" prefix for display
-              var clone = subLi.cloneNode(true);
-              var link = clone.querySelector('a');
-              if (link) {
-                link.textContent = link.textContent.replace(/^关键词[：:]\s*/, '');
-              }
-              items.push(clone);
-            }
-          });
-        } else {
-          // No children — check if it's a keyword item
-          var a = li.querySelector(':scope > a');
-          if (a && a.textContent.indexOf('关键词') !== -1) {
-            var clone = li.cloneNode(true);
-            var link = clone.querySelector('a');
-            if (link) {
-              link.textContent = link.textContent.replace(/^关键词[：:]\s*/, '');
-            }
-            items.push(clone);
+  var tocTitle   = document.getElementById('toc-title');
+  var nav        = document.getElementById('toc-nav');
+  var viewPills  = document.querySelectorAll('#view-toggle .sidebar-pill');
+  var hideSwitch = document.getElementById('hide-switch');
+
+  var keywordSections = document.querySelectorAll('.index-section[data-view="keywords"]');
+  var journalSections = document.querySelectorAll('.index-section[data-view="journals"]');
+
+  var currentView     = 'keywords';
+  var currentCategory = null;
+  var hideMode        = false;
+
+  var DETAILS_KEY = '文献详情';
+
+  // Sliding indicator element (single moving highlight — no cascade)
+  var indicator = document.createElement('div');
+  indicator.className = 'toc-indicator';
+  var ul = null;            // current <ul> of links
+  var linkByKey = {};       // key -> <a>
+
+  // ── helpers ────────────────────────────────────────────────────────────────
+
+  function attr() { return currentView === 'keywords' ? 'data-category' : 'data-journal'; }
+
+  function activeSections() {
+    return currentView === 'keywords' ? keywordSections : journalSections;
+  }
+
+  function show(el) { el.style.display = ''; }
+  function hide(el) { el.style.display = 'none'; }
+
+  // Show/hide every category-section inside the active view
+  function applyFilter() {
+    var filterCat = currentCategory === DETAILS_KEY ? null : currentCategory;
+    activeSections().forEach(function(view) {
+      view.querySelectorAll('.category-section').forEach(function(s) {
+        var key = s.getAttribute(attr());
+        var shouldShow = !hideMode || !filterCat || key === filterCat;
+        var wasHidden = s.style.display === 'none';
+        if (shouldShow) {
+          show(s);
+          if (wasHidden && !reduceMotion) {
+            s.classList.remove('fade-in');
+            void s.offsetWidth;
+            s.classList.add('fade-in');
           }
+        } else {
+          hide(s);
+          s.classList.remove('fade-in');
         }
       });
-      if (items.length > 0) {
-        topUl.innerHTML = '';
-        items.forEach(function(item) { topUl.appendChild(item); });
-      }
+    });
+  }
+
+  // ── sliding indicator ─────────────────────────────────────────────────────
+
+  function moveIndicator(key, animate) {
+    var link = key ? linkByKey[key] : null;
+    if (!link || !ul) {
+      indicator.style.opacity = '0';
+      return;
+    }
+    var li = link.parentElement;
+    if (!animate || reduceMotion) indicator.classList.add('no-anim');
+    indicator.style.opacity = '1';
+    indicator.style.transform = 'translateY(' + li.offsetTop + 'px)';
+    indicator.style.height = li.offsetHeight + 'px';
+    if (!animate || reduceMotion) {
+      // force reflow then re-enable transition
+      void indicator.offsetWidth;
+      indicator.classList.remove('no-anim');
     }
   }
 
+  function setActive(key, animateIndicator) {
+    currentCategory = key;
+    nav.querySelectorAll('a[data-filter]').forEach(function(a) {
+      var on = a.getAttribute('data-filter') === key;
+      a.classList.toggle('active', on);
+      if (on) a.setAttribute('aria-current', 'location');
+      else a.removeAttribute('aria-current');
+    });
+    moveIndicator(key, animateIndicator !== false);
+  }
+
+  // ── programmatic scroll handling ────────────────────────────────────────────
+
+  var programmatic = false;
+  var settleTimer = null;
+
+  function scrollToKey(key) {
+    var target = null;
+    if (key === DETAILS_KEY) {
+      target = document.getElementById('文献详情');
+    } else {
+      var selector = '.category-section[' + attr() + '="' + CSS.escape(key) + '"]';
+      activeSections().forEach(function(view) {
+        if (!target) target = view.querySelector(selector);
+      });
+    }
+    if (!target) return;
+
+    if (reduceMotion) {
+      target.scrollIntoView({ block: 'start' });
+      return;
+    }
+
+    programmatic = true;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    // Clear programmatic flag when scrolling settles
+    var clear = function() {
+      programmatic = false;
+      window.removeEventListener('scrollend', clear);
+    };
+    if ('onscrollend' in window) {
+      window.addEventListener('scrollend', clear, { once: true });
+    }
+    // Fallback: settle timeout reset on each scroll tick
+    function onScrollSettle() {
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = setTimeout(function() {
+        programmatic = false;
+        window.removeEventListener('scroll', onScrollSettle);
+      }, 140);
+    }
+    window.addEventListener('scroll', onScrollSettle, { passive: true });
+  }
+
+  // Cancel programmatic suppression the moment the user takes over
+  ['wheel', 'touchstart', 'keydown'].forEach(function(evt) {
+    window.addEventListener(evt, function() { programmatic = false; }, { passive: true });
+  });
+
+  // ── sidebar build ───────────────────────────────────────────────────────────
+
+  function buildSidebar() {
+    nav.innerHTML = '';
+    linkByKey = {};
+    ul = document.createElement('ul');
+    ul.appendChild(indicator);
+
+    var seen = [];
+    activeSections().forEach(function(view) {
+      view.querySelectorAll('.category-section[' + attr() + ']').forEach(function(s) {
+        var v = s.getAttribute(attr());
+        if (v && seen.indexOf(v) === -1) seen.push(v);
+      });
+    });
+    seen.sort(function(a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
+
+    // 文献详情 is a normal tag, appended last
+    seen.push(DETAILS_KEY);
+
+    seen.forEach(function(cat) {
+      var li = document.createElement('li');
+      var a  = document.createElement('a');
+      a.href = '#';
+      a.textContent = cat;
+      a.setAttribute('data-filter', cat);
+      a.addEventListener('click', function(e) {
+        e.preventDefault();
+        onTagClick(cat);
+      });
+      li.appendChild(a);
+      ul.appendChild(li);
+      linkByKey[cat] = a;
+    });
+
+    nav.appendChild(ul);
+    // Position indicator without animation on (re)build
+    requestAnimationFrame(function() { moveIndicator(currentCategory, false); });
+  }
+
+  // ── interactions ────────────────────────────────────────────────────────────
+
+  function onTagClick(cat) {
+    if (hideMode && cat === currentCategory && cat !== DETAILS_KEY) {
+      // Toggle off — show all
+      setActive(null);
+      applyFilter();
+      return;
+    }
+    setActive(cat);
+    if (cat !== DETAILS_KEY) applyFilter();
+    scrollToKey(cat);
+  }
+
+  // View toggle
+  viewPills.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var view = this.getAttribute('data-view');
+      if (view === currentView) return;
+      viewPills.forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+
+      keywordSections.forEach(hide);
+      journalSections.forEach(hide);
+
+      currentView     = view;
+      currentCategory = null;
+      hideMode        = false;
+      if (hideSwitch) { hideSwitch.classList.remove('on'); hideSwitch.setAttribute('aria-checked', 'false'); }
+      if (tocTitle) tocTitle.textContent = view === 'keywords' ? '关键词 · Keywords' : '期刊 · Journals';
+
+      activeSections().forEach(function(s) {
+        show(s);
+        s.querySelectorAll('.category-section').forEach(show);
+      });
+
+      buildSidebar();
+      requestAnimationFrame(spy);
+    });
+  });
+
+  // Hide-mode switch
+  if (hideSwitch) {
+    hideSwitch.addEventListener('click', function() {
+      hideMode = !hideMode;
+      this.classList.toggle('on', hideMode);
+      this.setAttribute('aria-checked', hideMode ? 'true' : 'false');
+      if (!hideMode) { setActive(null); }
+      applyFilter();
+      if (hideMode && currentCategory) moveIndicator(currentCategory, false);
+    });
+  }
+
+  // ── scroll-spy (suppressed during programmatic scroll) ──────────────────────
+
+  function spy() {
+    if (programmatic || hideMode || !nav) return;
+    var line = 90; // active reference line from top of viewport
+    var a = attr();
+    var current = null;
+    activeSections().forEach(function(view) {
+      view.querySelectorAll('.category-section[' + a + ']').forEach(function(s) {
+        if (s.style.display !== 'none' && s.getBoundingClientRect().top <= line) {
+          current = s.getAttribute(a);
+        }
+      });
+    });
+    // Details section
+    var details = document.getElementById('文献详情');
+    if (details && details.getBoundingClientRect().top <= line) current = DETAILS_KEY;
+    // Bottom of page → force last tag
+    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+      current = DETAILS_KEY;
+    }
+    if (current !== currentCategory) setActive(current);
+  }
+  window.addEventListener('scroll', spy, { passive: true });
+
+  // Reposition indicator on resize / layout shifts
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(function() { moveIndicator(currentCategory, false); });
+    ro.observe(nav);
+  }
+  window.addEventListener('resize', function() { moveIndicator(currentCategory, false); });
+
+  // ── init ────────────────────────────────────────────────────────────────────
+
+  buildSidebar();
+  requestAnimationFrame(spy);
+
   // Wrap article detail cards
-  var anchors = document.querySelectorAll('a[id^="article-"]');
-  anchors.forEach(function(anchor) {
+  document.querySelectorAll('a[id^="article-"]').forEach(function(anchor) {
     var p = anchor.parentElement;
     if (!p || p.tagName !== 'P') return;
     var card = document.createElement('div');
@@ -140,12 +367,12 @@ $endif$
       card.appendChild(sibling);
       sibling = next;
     }
-    var paragraphs = card.querySelectorAll('p');
-    if (paragraphs.length > 0) paragraphs[paragraphs.length - 1].classList.add('abstract');
+    var ps = card.querySelectorAll('p');
+    if (ps.length > 0) ps[ps.length - 1].classList.add('abstract');
   });
 
-  // TOC sidebar toggle (mobile)
-  var toggle = document.getElementById('toc-toggle');
+  // Mobile sidebar toggle
+  var toggle  = document.getElementById('toc-toggle');
   var sidebar = document.getElementById('toc-sidebar');
   var overlay = document.getElementById('toc-overlay');
   if (toggle && sidebar) {
@@ -155,30 +382,8 @@ $endif$
     });
     if (overlay) overlay.addEventListener('click', function() {
       sidebar.classList.remove('open');
-      overlay.classList.remove('open');
+      if (overlay) overlay.classList.remove('open');
     });
-  }
-
-  // Active TOC link tracking
-  var tocLinks = document.querySelectorAll('#toc-sidebar nav > ul > li > a[href^="#"]');
-  if (tocLinks.length > 0) {
-    var targets = [];
-    tocLinks.forEach(function(link) {
-      var id = link.getAttribute('href').slice(1);
-      var el = document.getElementById(id);
-      if (el) targets.push({ el: el, link: link });
-    });
-    function updateActive() {
-      var scrollY = window.scrollY + 60;
-      var current = null;
-      for (var i = targets.length - 1; i >= 0; i--) {
-        if (targets[i].el.offsetTop <= scrollY) { current = targets[i]; break; }
-      }
-      tocLinks.forEach(function(l) { l.classList.remove('active'); });
-      if (current) current.link.classList.add('active');
-    }
-    window.addEventListener('scroll', updateActive, { passive: true });
-    updateActive();
   }
 })();
 </script>

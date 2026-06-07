@@ -25,7 +25,6 @@ def categorize_articles(rows: list[dict[str, str]]) -> OrderedDict[str, list[dic
     seen: set[tuple[str, str]] = set()
     for row in rows:
         title = value(row, "title", "")
-        doi = value(row, "doi", "")
         if not title:
             continue
         category_text = value(row, "category", "") or value(row, "matched_keywords", "")
@@ -45,6 +44,38 @@ def categorize_articles(rows: list[dict[str, str]]) -> OrderedDict[str, list[dic
     if "Uncategorized" in categories:
         sorted_keys.append("Uncategorized")
     return OrderedDict((k, categories[k]) for k in sorted_keys)
+
+
+def categorize_by_journal(rows: list[dict[str, str]]) -> OrderedDict[str, list[dict[str, str]]]:
+    """Group articles by their journal name."""
+    journals: OrderedDict[str, list[dict[str, str]]] = OrderedDict()
+    seen: set[str] = set()
+    for row in rows:
+        title = value(row, "title", "")
+        if not title:
+            continue
+        journal_name = value(row, "journal", "Unknown Journal")
+        key = article_key(row)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        journals.setdefault(journal_name, []).append(row)
+    return OrderedDict(sorted(journals.items(), key=lambda x: x[0].casefold()))
+
+
+def recommended_articles(rows: list[dict[str, str]]) -> list[dict[str, str]]:
+    """Return articles marked as recommended."""
+    seen: set[str] = set()
+    recommended: list[dict[str, str]] = []
+    for row in rows:
+        if row.get("recommended", "").lower() != "true":
+            continue
+        key = article_key(row)
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        recommended.append(row)
+    return recommended
 
 
 def unique_articles(rows: list[dict[str, str]]) -> list[dict[str, str]]:
