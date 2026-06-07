@@ -8,7 +8,6 @@ import threading
 from typing import Any
 
 import httpx
-from tenacity import retry_if_exception, stop_after_attempt, wait_exponential
 
 from ..category import infer_categories
 from ..config import AppConfig
@@ -39,44 +38,55 @@ class CrossrefClient:
             issns = issns_for_journal(journal, config.search.journal_issns) or [""]
             tasks.append((journal, issns))
 
-        articles: list[Article] = []
-        seen: set[str] = set()
-        lock = threading.Lock()
+        all_batches: list[list[Article]] = [[] for _ in tasks]
         counter = [0]
+        lock = threading.Lock()
 
-        def _fetch(task: tuple[str, list[str]]) -> list[Article]:
+        def _fetch(idx: int, task: tuple[str, list[str]]) -> tuple[int, list[Article]]:
             journal, issns = task
             client = httpx.Client(timeout=45, headers=self._headers)
             try:
-                items = _search_page(client, self.email, "", journal, issns, start, end, rows=100)
                 result = []
-                for item in items:
-                    article = self._item_to_article(item, config, start, end)
-                    if article is not None:
-                        result.append(article)
-                return result
+                cursor = "*"
+                while True:
+                    items, next_cursor = _search_page(client, self.email, "", journal, issns, start, end, rows=100, cursor=cursor)
+                    new_count = 0
+                    for item in items:
+                        article = self._item_to_article(item, config, start, end)
+                        if article is not None:
+                            result.append(article)
+                            new_count += 1
+                    with lock:
+                        counter[0] += new_count
+                        print(f"\rCollecting Crossref: {counter[0]} articles", end="", flush=True)
+                    if not items or not next_cursor or next_cursor == cursor:
+                        break
+                    cursor = next_cursor
+                return idx, result
             except Exception:
-                return []
+                return idx, []
             finally:
                 client.close()
 
         with ThreadPoolExecutor(max_workers=_SEARCH_WORKERS) as pool:
-            futures = {pool.submit(_fetch, t): t for t in tasks}
+            futures = [pool.submit(_fetch, i, t) for i, t in enumerate(tasks)]
             for future in as_completed(futures):
-                batch = future.result()
-                with lock:
-                    for article in batch:
-                        key = article.doi.lower() or article.title.lower()
-                        if not key or key in seen:
-                            continue
-                        seen.add(key)
-                        articles.append(article)
-                        counter[0] += 1
-                        print(f"\rCollecting Crossref: {counter[0]} articles", end="", flush=True)
+                idx, batch = future.result()
+                all_batches[idx] = batch
         print()
-        # Sort by DOI for deterministic output, then apply max_results
+
+        # Merge in deterministic task order, then dedup and sort
+        seen: set[str] = set()
+        articles: list[Article] = []
+        for batch in all_batches:
+            for article in batch:
+                key = article.doi.lower() or article.title.lower()
+                if not key or key in seen:
+                    continue
+                seen.add(key)
+                articles.append(article)
         articles.sort(key=lambda a: (a.doi or a.title).casefold())
-        return articles[:max_results]
+        return articles
 
     def _item_to_article(
         self,
@@ -167,7 +177,8 @@ def _search_page(
     start: date,
     end: date,
     rows: int,
-) -> list[dict[str, Any]]:
+    cursor: str = "*",
+) -> tuple[list[dict[str, Any]], str]:
     filters = [
         "type:journal-article",
         f"from-pub-date:{start.isoformat()}",
@@ -180,8 +191,7 @@ def _search_page(
     params: dict[str, Any] = {
         "filter": ",".join(filters),
         "rows": rows,
-        "sort": "published",
-        "order": "desc",
+        "cursor": cursor,
     }
     if keyword:
         params["query.bibliographic"] = keyword
@@ -192,9 +202,10 @@ def _search_page(
     try:
         response = client.get(CROSSREF_WORKS_URL, params=params)
         response.raise_for_status()
-        return response.json().get("message", {}).get("items", [])
+        message = response.json().get("message", {})
+        return message.get("items", []), message.get("next-cursor", "")
     except Exception:
-        return []
+        return [], ""
 
 
 def collect_crossref(config: AppConfig, start: date, end: date, max_results: int = 500) -> list[Article]:

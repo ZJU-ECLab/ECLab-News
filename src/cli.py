@@ -214,7 +214,8 @@ def _sub_config(config: AppConfig, journals: list[str]) -> AppConfig:
 def detect_sources(config: AppConfig, config_path: str, lookback_months: int = 6) -> None:
     """Probe each journal in PubMed and Crossref; update [search.journal_sources] in config.toml."""
     end = date.today()
-    start = date.fromordinal(end.toordinal() - lookback_months * 30)
+    start = date(end.year if end.month > lookback_months else end.year - 1,
+                 (end.month - lookback_months - 1) % 12 + 1, 1)
 
     results: dict[str, list[str]] = {}
     ua = f"eclab-news/0.1 (mailto:{config.search.email})" if config.search.email else "eclab-news/0.1"

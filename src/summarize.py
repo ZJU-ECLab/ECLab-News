@@ -56,7 +56,7 @@ def summarize_csv(
             idx, updated_row = future.result()
             with lock:
                 rows[idx] = updated_row
-                write_articles(rows, csv_path)
+    write_articles(rows, csv_path)
 
     print()
     log_missing_after_summarize(csv_path)
