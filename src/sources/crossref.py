@@ -66,8 +66,6 @@ class CrossrefClient:
                 batch = future.result()
                 with lock:
                     for article in batch:
-                        if len(articles) >= max_results:
-                            break
                         key = article.doi.lower() or article.title.lower()
                         if not key or key in seen:
                             continue
@@ -76,7 +74,9 @@ class CrossrefClient:
                         counter[0] += 1
                         print(f"\rCollecting Crossref: {counter[0]} articles", end="", flush=True)
         print()
-        return articles
+        # Sort by DOI for deterministic output, then apply max_results
+        articles.sort(key=lambda a: (a.doi or a.title).casefold())
+        return articles[:max_results]
 
     def _item_to_article(
         self,

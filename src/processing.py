@@ -17,6 +17,7 @@ from .sources.openalex import OpenAlexClient
 from .sources.pubmed import PubMedClient
 from .sources.scopus import ScopusClient
 from .sources.semanticscholar import SemanticScholarClient
+from .sources.springer import SpringerClient
 
 _ENRICH_WORKERS = 5
 
@@ -131,7 +132,7 @@ def _keep_article(
     return True, ""
 
 
-_TRUNCATED_ABSTRACT_RE = re.compile(r'^[=<\(]')
+_TRUNCATED_ABSTRACT_RE = re.compile(r'^[=<\(a-z]')
 
 
 def _needs_enrichment(article: Article) -> bool:
@@ -165,16 +166,33 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
         openalex = OpenAlexClient(email=config.search.email)
         s2 = SemanticScholarClient()
         pubmed = PubMedClient(email=config.search.email, tool=config.search.ncbi_tool)
+        springer = SpringerClient() if os.getenv("SPRINGER_API_KEY") else None
         scopus = ScopusClient() if use_scopus else None
         try:
-            # Order: fast single-request sources first, slow multi-request sources last
-            # 1. Crossref DOI lookup (fast, often has keywords/authors)
+            # 1. PubMed DOI search first — most reliable for complete abstracts
+            #    (2 requests, but worth it to avoid truncated Crossref abstracts)
+            if article.doi:
+                pa = pubmed.fetch_by_doi(article.doi, config)
+                if pa is not None:
+                    _merge_missing(article, pa)
+            if not _needs_enrichment(article):
+                return article
+
+            # 2. Crossref DOI lookup (fast, often has keywords/authors)
             if article.doi:
                 crossref._enrich_missing(article)
             if not _needs_enrichment(article):
                 return article
 
-            # 2. OpenAlex DOI lookup (fast, 1 request)
+            # 3. Springer Nature DOI lookup (for 10.1007/ DOIs — reliable abstracts)
+            if springer and article.doi and article.doi.startswith("10.1007/"):
+                sa = springer.fetch_by_doi(article.doi)
+                if sa is not None:
+                    _merge_missing(article, sa)
+            if not _needs_enrichment(article):
+                return article
+
+            # 4. OpenAlex DOI lookup (fast, 1 request)
             if article.doi:
                 oa = openalex.fetch_by_doi(article.doi)
                 if oa is not None:
@@ -182,7 +200,7 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
             if not _needs_enrichment(article):
                 return article
 
-            # 3. Semantic Scholar DOI lookup (fast, 1 request)
+            # 5. Semantic Scholar DOI lookup (fast, 1 request)
             if article.doi:
                 s2a = s2.fetch_by_doi(article.doi)
                 if s2a is not None:
@@ -190,23 +208,7 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
             if not _needs_enrichment(article):
                 return article
 
-            # 4. OpenAlex title search fallback (1 request, for paywalled journals)
-            if article.title and not article.abstract:
-                oa = openalex.fetch_by_title(article.title)
-                if oa is not None:
-                    _merge_missing(article, oa)
-            if not _needs_enrichment(article):
-                return article
-
-            # 5. PubMed DOI search (slow, 2 requests — only if still missing)
-            if article.doi and (not article.abstract or not article.keywords):
-                pa = pubmed.fetch_by_doi(article.doi, config)
-                if pa is not None:
-                    _merge_missing(article, pa)
-            if not _needs_enrichment(article):
-                return article
-
-            # 5b. PubMed title search fallback (for paywalled/crossref-only journals)
+            # 6. PubMed title search fallback (for paywalled/crossref-only journals)
             if article.title and not article.abstract:
                 pa = pubmed.fetch_by_title(article.title, config)
                 if pa is not None:
@@ -214,7 +216,15 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
             if not _needs_enrichment(article):
                 return article
 
-            # 5c. Re-fetch truncated abstracts (start with = < ( — beginning lost)
+            # 7. OpenAlex title search fallback (1 request, for paywalled journals)
+            if article.title and not article.abstract:
+                oa = openalex.fetch_by_title(article.title)
+                if oa is not None:
+                    _merge_missing(article, oa)
+            if not _needs_enrichment(article):
+                return article
+
+            # 8. Re-fetch truncated abstracts (start with = < ( or lowercase — beginning lost)
             if article.doi and article.abstract and _TRUNCATED_ABSTRACT_RE.match(article.abstract):
                 pa = pubmed.fetch_by_doi(article.doi, config)
                 if pa is not None and pa.abstract and not _TRUNCATED_ABSTRACT_RE.match(pa.abstract):
@@ -224,16 +234,21 @@ def enrich_articles(config: AppConfig, articles: list[Article]) -> list[Article]
             if not _needs_enrichment(article):
                 return article
 
-            # 6. Scopus DOI lookup (last resort, requires API key)
+            # 9. Scopus DOI lookup (last resort, requires API key)
             if scopus and article.doi and (not article.abstract or not article.keywords):
                 sa = scopus.fetch_by_doi(article.doi)
                 if sa is not None:
                     _merge_missing(article, sa)
+        except Exception:
+            # Return article as-is if enrichment fails (e.g. API rate limit)
+            return article
         finally:
             crossref.close()
             openalex.close()
             s2.close()
             pubmed.close()
+            if springer:
+                springer.close()
             if scopus:
                 scopus.close()
         return article

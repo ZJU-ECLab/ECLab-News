@@ -33,6 +33,9 @@ def ensure_row(row: dict[str, object]) -> dict[str, str]:
 
 
 def deduplicate_articles(articles: list[Article]) -> list[Article]:
+    # Sort by DOI (or title) to ensure consistent merge order regardless of
+    # collection order (ThreadPoolExecutor + as_completed is non-deterministic).
+    articles = sorted(articles, key=lambda a: (a.doi or a.title).casefold())
     seen: dict[str, Article] = {}
     unique: list[Article] = []
     for article in articles:
