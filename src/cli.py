@@ -15,6 +15,7 @@ from .journals import issns_for_journal
 from .models import Article
 from .processing import process_articles
 from .render import render_markdown
+from .site_export import build_manifest, export_issue_json
 from .sources.crossref import collect_crossref
 from .sources.pubmed import collect_pubmed
 from .summarize import summarize_csv
@@ -99,6 +100,18 @@ def main() -> None:
     pandoc_parser.add_argument("--md", required=True)
     pandoc_parser.add_argument("--output-dir", default="reports")
 
+    site_parser = _base_parser(subparsers, "site-export")
+    site_parser.add_argument("--csv", required=True)
+    site_parser.add_argument("--output", required=True)
+    site_parser.add_argument("--start", default="", help="Override issue start date YYYY-MM-DD")
+    site_parser.add_argument("--end", default="", help="Override issue end date YYYY-MM-DD")
+    site_parser.add_argument("--accent-color", default="", help="Override accent color (auto-generated if blank)")
+    site_parser.add_argument("--include-irrelevant", action="store_true")
+
+    manifest_parser = _base_parser(subparsers, "manifest")
+    manifest_parser.add_argument("--issues-dir", required=True)
+    manifest_parser.add_argument("--output", required=True)
+
     all_parser = _base_parser(subparsers, "all")
     all_parser.add_argument("--start", required=True)
     all_parser.add_argument("--end", required=True)
@@ -127,6 +140,19 @@ def main() -> None:
         output_dir = Path(args.output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
         render_pandoc(args.md, output_dir, Path(args.md).stem, config)
+    elif args.command == "site-export":
+        if args.start:
+            config.project.start_date = args.start
+            config.project.year = _parse_date(args.start).year
+            config.project.month = _parse_date(args.start).month
+        if args.end:
+            config.project.end_date = args.end
+        config.pandoc.accent_color = args.accent_color or _random_accent_color()
+        payload = export_issue_json(config, args.csv, args.output, args.include_irrelevant)
+        print(f"Wrote issue JSON ({payload['count']} articles) to {args.output}")
+    elif args.command == "manifest":
+        manifest = build_manifest(args.issues_dir, args.output)
+        print(f"Wrote manifest ({manifest['count']} issues) to {args.output}")
     elif args.command == "all":
         output_dir = Path(args.output_dir)
         start_date = _parse_date(args.start)
@@ -142,13 +168,16 @@ def main() -> None:
         lab_md = output_dir / "reports" / f"journal_{date_suffix}_lab.md"
         wechat_md = output_dir / "reports" / f"journal_{date_suffix}_wechat.md"
         reports_dir = output_dir / "reports"
+        site_json = output_dir / "site" / "issues" / f"{date_suffix}.json"
         articles = collect_articles(config, start_date, end_date, args.max_results)
         write_article_rows(articles, csv_path)
         summarize_csv(config, str(csv_path), force=args.force_summary, retry_zero=True)
         render_markdown(config, str(csv_path), str(lab_md), "lab")
         render_markdown(config, str(csv_path), str(wechat_md), "wechat")
         render_pandoc(str(lab_md), reports_dir, lab_md.stem, config)
-        print(f"Wrote {csv_path}, {lab_md}, {wechat_md}, and pandoc outputs")
+        export_issue_json(config, str(csv_path), str(site_json))
+        build_manifest(site_json.parent, output_dir / "site" / "manifest.json")
+        print(f"Wrote {csv_path}, {lab_md}, {wechat_md}, {site_json}, and pandoc outputs")
     elif args.command == "detect-sources":
         detect_sources(config, args.config, args.lookback_months)
 

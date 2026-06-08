@@ -68,6 +68,40 @@ jobs:
             --start "${{ steps.dates.outputs.start }}" \
             --end   "${{ steps.dates.outputs.end }}" \
             --output-dir .
+      - name: Publish issue to website repo
+        env:
+          SITE_DEPLOY_TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+        run: |
+          LABEL="${{ steps.dates.outputs.label }}"
+          ISSUE_JSON="site/issues/${LABEL}.json"
+          if [[ ! -f "$ISSUE_JSON" ]]; then
+            echo "No issue JSON produced at $ISSUE_JSON; skipping site publish."
+            exit 0
+          fi
+          if [[ -z "$SITE_DEPLOY_TOKEN" ]]; then
+            echo "SITE_DEPLOY_TOKEN not set; skipping site publish."
+            exit 0
+          fi
+          git clone --depth 1 \
+            "https://x-access-token:${SITE_DEPLOY_TOKEN}@github.com/ZJU-ECLab/ZJU-ECLab.github.io.git" \
+            site-repo
+          mkdir -p site-repo/data/issues
+          cp "$ISSUE_JSON" "site-repo/data/issues/${LABEL}.json"
+          # Rebuild the manifest from all issue files now present in the site repo
+          eclab-news manifest \
+            --config config.toml \
+            --issues-dir site-repo/data/issues \
+            --output site-repo/data/manifest.json
+          cd site-repo
+          git config user.name "eclab-news-bot"
+          git config user.email "eclab-news-bot@users.noreply.github.com"
+          git add data/issues/"${LABEL}".json data/manifest.json
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -m "Publish issue ${LABEL//_/ – }"
+            git push
+          fi
       - name: Upload release assets and publish
         if: github.event_name == 'release'
         env:

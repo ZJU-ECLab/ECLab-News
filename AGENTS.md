@@ -37,7 +37,35 @@ Chinese summaries from abstracts, and renders Markdown/HTML reports.
    Converts lab Markdown to HTML using pandoc with the template and theme in
    `pandoc/`. Reads accent color from config.
 
-`eclab-news all` runs all steps in order.
+6. `eclab-news site-export`
+   Writes one weekly issue as a normalized JSON file (`<start>_<end>.json`) for
+   the website. Contains issue metadata (label, title, date range, accent color)
+   plus a flat list of articles including abstracts. Keyword/journal grouping is
+   derived client-side by the site, so the JSON stays a single article list.
+
+7. `eclab-news manifest`
+   Scans a directory of issue JSON files and writes `manifest.json` (all issues
+   newest-first with lightweight metadata only). Used to rebuild the site index
+   after publishing a new issue.
+
+`eclab-news all` runs collect → summarize → render → pandoc → site-export →
+manifest in order, writing the JSON to `site/issues/` and `site/manifest.json`.
+
+## Website (ZJU-ECLab.github.io)
+
+The public site is a separate repo, `ZJU-ECLab/ZJU-ECLab.github.io` (the org's
+default GitHub Pages site at <https://zju-eclab.github.io>). It is a data-driven
+single-page app — one shared template renders every issue, so **no per-week HTML
+is generated**:
+
+- `index.html` + `assets/style.css` (ported from `pandoc/theme.css`) + `assets/app.js`.
+- `data/manifest.json` lists all issues; `data/issues/<label>.json` holds each issue.
+- Hash routes: `#/` (landing, grouped by year) and `#/issue/<start>_<end>`.
+
+This repo's `.github/workflows/release.yml` runs the pipeline, then clones the
+site repo using the `SITE_DEPLOY_TOKEN` secret, copies the new issue JSON into
+`data/issues/`, rebuilds `manifest.json` via `eclab-news manifest`, and pushes.
+The WeChat Markdown's "完整版" link points to `zju-eclab.github.io/#/issue/<label>`.
 
 ## Important Files
 
@@ -46,6 +74,7 @@ Chinese summaries from abstracts, and renders Markdown/HTML reports.
 - `src/processing.py`: filtering pipeline and multi-source enrichment.
 - `src/render.py`: Markdown rendering (lab + wechat variants).
 - `src/summarize.py`: LLM summarization.
+- `src/site_export.py`: issue JSON export + manifest builder for the website.
 - `src/config.py`: config dataclasses and loader.
 - `src/models.py`: `Article` dataclass and CSV columns.
 - `src/csv_io.py`: CSV read/write.

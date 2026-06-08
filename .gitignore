@@ -7,4 +7,6 @@ __pycache__/
 data/*.csv
 reports/*.md
 reports/*.html
+site/
+site-repo/
 dist

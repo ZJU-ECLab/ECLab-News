@@ -209,10 +209,7 @@ def _wechat_header(config: AppConfig) -> list[str]:
     if start and end:
         date_display = f"{start.replace('-', '.').removeprefix(f'{year}.')}-{end.replace('-', '.').removeprefix(f'{year}.')}"
         title_line = f"# {config.project.name} {year}.{date_display}"
-        full_url = (
-            f"https://github.com/ZJU-ECLab/ECLab-News/releases/download/"
-            f"v{start}_{end}/journal_{start}_{end}_lab.html"
-        )
+        full_url = f"https://zju-eclab.github.io/#/issue/{start}_{end}"
     else:
         title_line = f"# {config.project.name} {year}年{month}月刊".strip()
         full_url = config.project.wechat_full_version_url or ""
