@@ -5,7 +5,7 @@
 Automates the Emotion and Culture Lab monthly literature journal.
 Collects article metadata from free scholarly APIs (Crossref, PubMed, OpenAlex,
 Semantic Scholar, Scopus), enriches missing fields, uses an LLM to generate
-Chinese summaries from abstracts, and renders Markdown/HTML reports.
+Chinese summaries from abstracts, and renders Markdown reports.
 
 ## Main Workflow
 
@@ -33,23 +33,19 @@ Chinese summaries from abstracts, and renders Markdown/HTML reports.
      interactive filtering in HTML output via sidebar categories.
    - `--variant wechat`: compact format without extra blank lines after headings.
 
-5. `eclab-news pandoc`
-   Converts lab Markdown to HTML using pandoc with the template and theme in
-   `pandoc/`. Reads accent color from config.
-
-6. `eclab-news site-export`
+5. `eclab-news site-export`
    Writes one weekly issue as a normalized JSON file (`<start>_<end>.json`) for
    the website. Contains issue metadata (label, title, date range, accent color)
    plus a flat list of articles including abstracts. Keyword/journal grouping is
    derived client-side by the site, so the JSON stays a single article list.
 
-7. `eclab-news manifest`
+6. `eclab-news manifest`
    Scans a directory of issue JSON files and writes `manifest.json` (all issues
    newest-first with lightweight metadata only). Used to rebuild the site index
    after publishing a new issue.
 
-`eclab-news all` runs collect → summarize → render → pandoc → site-export →
-manifest in order, writing the JSON to `site/issues/` and `site/manifest.json`.
+`eclab-news all` runs collect → summarize → render → site-export → manifest in
+order, writing the JSON to `site/issues/` and `site/manifest.json`.
 
 ## Website (ZJU-ECLab.github.io)
 
@@ -69,7 +65,7 @@ The WeChat Markdown's "完整版" link points to `zju-eclab.github.io/#/issue/<l
 
 ## Important Files
 
-- `config.toml`: project, search, category, LLM prompt, and pandoc config.
+- `config.toml`: project, search, category, and LLM prompt config.
 - `src/cli.py`: CLI entry points and per-journal collection routing.
 - `src/processing.py`: filtering pipeline and multi-source enrichment.
 - `src/render.py`: Markdown rendering (lab + wechat variants).
@@ -83,8 +79,6 @@ The WeChat Markdown's "完整版" link points to `zju-eclab.github.io/#/issue/<l
 - `src/category.py`: keyword-based category inference.
 - `src/relevance.py`: basic psychology-relevance heuristic.
 - `src/sources/`: API clients (crossref, pubmed, openalex, semanticscholar, scopus, springer, common) and `abstract_fallback.py` (HTML landing-page abstract recovery).
-- `pandoc/template.html`: pandoc HTML template with TOC and watermark.
-- `pandoc/theme.css`: CSS theme (accent-color-driven).
 
 ## Contributor Rules
 
@@ -92,6 +86,5 @@ The WeChat Markdown's "完整版" link points to `zju-eclab.github.io/#/issue/<l
 - Prefer free APIs.
 - Keep incomplete article rows unless the user explicitly asks to drop them.
 - WeChat Markdown should stay compact; avoid blank lines after headings.
-- Lab Markdown should be spacious and include links from the index to details.
 - Avoid pandas/numpy; this project uses the standard library `csv` module.
 - When changing CSV columns, update `CSV_COLUMNS` in `src/models.py`.
