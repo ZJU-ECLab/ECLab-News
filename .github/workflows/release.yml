@@ -54,6 +54,29 @@ jobs:
           echo "start=$START" >> "$GITHUB_OUTPUT"
           echo "end=$END"     >> "$GITHUB_OUTPUT"
           echo "label=${START}_${END}" >> "$GITHUB_OUTPUT"
+      - name: Resolve release tag
+        if: github.event_name != 'release'
+        id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          LABEL="${{ steps.dates.outputs.label }}"
+          BASE_TAG="v${LABEL}"
+          # Check if the base tag already exists
+          if ! gh release view "$BASE_TAG" --json tagName >/dev/null 2>&1; then
+            echo "tag=$BASE_TAG" >> "$GITHUB_OUTPUT"
+            echo "suffix=" >> "$GITHUB_OUTPUT"
+            echo "Release tag $BASE_TAG is available."
+          else
+            SUFFIX=1
+            while gh release view "${BASE_TAG}_${SUFFIX}" --json tagName >/dev/null 2>&1; do
+              (( SUFFIX++ ))
+            done
+            FINAL_TAG="${BASE_TAG}_${SUFFIX}"
+            echo "tag=$FINAL_TAG" >> "$GITHUB_OUTPUT"
+            echo "suffix=_${SUFFIX}" >> "$GITHUB_OUTPUT"
+            echo "Release tag $BASE_TAG already exists; using $FINAL_TAG."
+          fi
       - name: Run full pipeline
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
@@ -119,8 +142,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          TAG="${{ steps.tag.outputs.tag }}"
           LABEL="${{ steps.dates.outputs.label }}"
-          gh release create "v${LABEL}" \
+          gh release create "$TAG" \
             --title "ECLab News ${LABEL//_/-}" \
             --generate-notes \
             reports/*_wechat.md \
