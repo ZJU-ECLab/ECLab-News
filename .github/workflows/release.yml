@@ -106,17 +106,17 @@ jobs:
           git clone --depth 1 \
             "https://x-access-token:${SITE_DEPLOY_TOKEN}@github.com/ZJU-ECLab/ZJU-ECLab.github.io.git" \
             site-repo
-          mkdir -p site-repo/data/issues
-          cp "$ISSUE_JSON" "site-repo/data/issues/${LABEL}.json"
+          mkdir -p site-repo/journal/data/issues
+          cp "$ISSUE_JSON" "site-repo/journal/data/issues/${LABEL}.json"
           # Rebuild the manifest from all issue files now present in the site repo
           eclab-news manifest \
             --config config.toml \
-            --issues-dir site-repo/data/issues \
-            --output site-repo/data/manifest.json
+            --issues-dir site-repo/journal/data/issues \
+            --output site-repo/journal/data/manifest.json
           cd site-repo
           git config user.name "eclab-news-bot"
           git config user.email "eclab-news-bot@users.noreply.github.com"
-          git add data/issues/"${LABEL}".json data/manifest.json
+          git add journal/data/issues/"${LABEL}".json journal/data/manifest.json
           if git diff --cached --quiet; then
             echo "No changes to publish."
           else

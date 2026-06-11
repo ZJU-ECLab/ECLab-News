@@ -50,18 +50,20 @@ order, writing the JSON to `site/issues/` and `site/manifest.json`.
 ## Website (ZJU-ECLab.github.io)
 
 The public site is a separate repo, `ZJU-ECLab/ZJU-ECLab.github.io` (the org's
-default GitHub Pages site at <https://zju-eclab.github.io>). It is a data-driven
-single-page app — one shared template renders every issue, so **no per-week HTML
-is generated**:
+default GitHub Pages site at <https://zju-eclab.github.io>). The weekly journal
+is a data-driven single-page app served at `/journal/` — one shared template
+renders every issue, so **no per-week HTML is generated**:
 
-- `index.html` + `assets/style.css` (ported from `pandoc/theme.css`) + `assets/app.js`.
-- `data/manifest.json` lists all issues; `data/issues/<label>.json` holds each issue.
+- `journal/index.html` + `assets/style.css` (ported from `pandoc/theme.css`) + `assets/app.js`.
+- `journal/data/manifest.json` lists all issues; `journal/data/issues/<label>.json`
+  holds each issue. The SPA fetches these from the absolute path `/journal/data/`.
 - Hash routes: `#/` (landing, grouped by year) and `#/issue/<start>_<end>`.
 
 This repo's `.github/workflows/release.yml` runs the pipeline, then clones the
 site repo using the `SITE_DEPLOY_TOKEN` secret, copies the new issue JSON into
-`data/issues/`, rebuilds `manifest.json` via `eclab-news manifest`, and pushes.
-The WeChat Markdown's "完整版" link points to `zju-eclab.github.io/#/issue/<label>`.
+`journal/data/issues/`, rebuilds `manifest.json` via `eclab-news manifest`, and
+pushes. The WeChat Markdown's "完整版" link points to
+`zju-eclab.github.io/journal/#/issue/<label>`.
 
 ## Important Files
 

@@ -49,10 +49,10 @@ uv run eclab-news manifest --config config.toml --issues-dir site/issues --outpu
 公开网站是独立仓库 `ZJU-ECLab/ZJU-ECLab.github.io`，组织默认 Pages 站点，
 地址 <https://zju-eclab.github.io>。它是数据驱动的单页应用：所有期刊共用同一套
 模板（`index.html` + `assets/app.js` + `assets/style.css`），**不为每期生成 HTML**。
-每期只是一个 `data/issues/<期次>.json`，`data/manifest.json` 列出全部期刊。
+每期只是一个 `journal/data/issues/<期次>.json`，`journal/data/manifest.json` 列出全部期刊。
 
-发布流程由本仓库的 GitHub Actions 完成：跑完流水线后，用 `SITE_DEPLOY_TOKEN`
-克隆网站仓库，把新一期 JSON 复制进 `data/issues/`，用 `eclab-news manifest`
+**推送流程**：CI 把 `site/issues/*.json` 准备好后，
+克隆网站仓库，把新一期 JSON 复制进 `journal/data/issues/`，用 `eclab-news manifest`
 重建 `manifest.json` 后推送。
 
 ## GitHub Actions
