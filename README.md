@@ -63,7 +63,9 @@ issue JSON，再上传 manifest。只有当网站、issue 和 manifest 都能从
 添加仓库 Secrets：
 
 - `LLM_API_KEY`、`LLM_API_BASE`（必需），可选 `LLM_MODEL`、`NCBI_API_KEY`、`S2_API_KEY`、`SCOPUS_API_KEY`
-- `CLOUDBASE_API_KEY`：CloudBase 环境的发布密钥，用于上传 issue 和 manifest。
+- `CLOUDBASE_API_KEY`：CloudBase 环境的服务端 API Key，用于上传 issue 和
+  manifest。Secret 值只填写创建时显示的完整 Key 本体，不要填写 Key ID、名称、
+  `Bearer ` 前缀或引号。
 - `SITE_DEPLOY_TOKEN`：对 `ZJU-ECLab.github.io` 具有 `contents:write` 权限的
   细粒度 Personal Access Token，仅用于在发布验证成功后发送 announcement dispatch。
 

@@ -63,7 +63,8 @@ renders every issue, so **no per-week HTML is generated**:
 This repo's `.github/workflows/release.yml` runs the pipeline, downloads only
 the lightweight CloudBase manifest, merges the new issue metadata with
 `eclab-news manifest-update`, uploads the issue first and the manifest last,
-then verifies the production URLs. A newly published label dispatches the site
+then verifies the production URLs. CI authenticates with the environment's
+server-side `CLOUDBASE_API_KEY`. A newly published label dispatches the site
 repo's announcement workflow through `SITE_DEPLOY_TOKEN`. The WeChat
 Markdown's "完整版" link points to
 `zju-eclab.github.io/journal/#/issue/<label>`.

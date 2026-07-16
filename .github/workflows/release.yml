@@ -107,9 +107,58 @@ jobs:
             echo "::error::CLOUDBASE_API_KEY is not configured."
             exit 1
           fi
+
+          # GitHub secrets should contain only the raw server API Key. Be
+          # forgiving of a pasted Bearer prefix or trailing line break.
+          CLOUDBASE_API_KEY="${CLOUDBASE_API_KEY//$'\r'/}"
+          CLOUDBASE_API_KEY="${CLOUDBASE_API_KEY//$'\n'/}"
+          CLOUDBASE_API_KEY="${CLOUDBASE_API_KEY#Bearer }"
+          export CLOUDBASE_API_KEY
+
+          # The CLI otherwise replaces the useful exchange error with a generic
+          # login failure. Validate the same endpoint without printing secrets.
+          python3 - <<'PY'
+          import json
+          import os
+          import sys
+          import urllib.request
+
+          env_id = os.environ["CLOUDBASE_ENV_ID"]
+          api_key = os.environ["CLOUDBASE_API_KEY"]
+          url = f"https://{env_id}.ap-shanghai.tcb-api.tencentcloudapi.com/capi/credential"
+          request = urllib.request.Request(
+              url,
+              data=json.dumps({"env": env_id}).encode("utf-8"),
+              headers={
+                  "Authorization": f"Bearer {api_key}",
+                  "Content-Type": "application/json",
+              },
+              method="POST",
+          )
+          try:
+              with urllib.request.urlopen(request, timeout=20) as response:
+                  payload = json.load(response)
+          except Exception as exc:
+              print(f"::error::Could not reach the CloudBase API-key endpoint: {exc}")
+              raise SystemExit(1)
+
+          if payload.get("code") not in (0, "0"):
+              code = payload.get("code", "UNKNOWN")
+              message = payload.get("message") or payload.get("msg") or "Unknown error"
+              print(f"::error::CloudBase server API-key exchange failed ({code}): {message}")
+              raise SystemExit(1)
+          data = payload.get("data") or {}
+          required = ("TmpSecretId", "TmpSecretKey", "Token")
+          if any(not data.get(field) for field in required):
+              print("::error::CloudBase returned incomplete temporary credentials.")
+              raise SystemExit(1)
+          print("CloudBase server API-key exchange succeeded.")
+          PY
+
           npx --yes @cloudbase/cli@3.5.9 login \
             --cloudbase-api-key "$CLOUDBASE_API_KEY" \
-            --env-id "$CLOUDBASE_ENV_ID"
+            --env-id "$CLOUDBASE_ENV_ID" \
+            --region ap-shanghai
 
       - name: Publish issue to CloudBase
         id: publish
