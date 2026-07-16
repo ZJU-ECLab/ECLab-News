@@ -55,14 +55,17 @@ is a data-driven single-page app served at `/journal/` — one shared template
 renders every issue, so **no per-week HTML is generated**:
 
 - `journal/index.html` + `assets/style.css` (ported from `pandoc/theme.css`) + `assets/app.js`.
-- `journal/data/manifest.json` lists all issues; `journal/data/issues/<label>.json`
-  holds each issue. The SPA fetches these from the absolute path `/journal/data/`.
+- CloudBase object storage serves `journal/v1/manifest.json` and
+  `journal/v1/issues/<label>.json`. The SPA fetches them directly from its
+  production CDN domain.
 - Hash routes: `#/` (landing, grouped by year) and `#/issue/<start>_<end>`.
 
-This repo's `.github/workflows/release.yml` runs the pipeline, then clones the
-site repo using the `SITE_DEPLOY_TOKEN` secret, copies the new issue JSON into
-`journal/data/issues/`, rebuilds `manifest.json` via `eclab-news manifest`, and
-pushes. The WeChat Markdown's "完整版" link points to
+This repo's `.github/workflows/release.yml` runs the pipeline, downloads only
+the lightweight CloudBase manifest, merges the new issue metadata with
+`eclab-news manifest-update`, uploads the issue first and the manifest last,
+then verifies the production URLs. A newly published label dispatches the site
+repo's announcement workflow through `SITE_DEPLOY_TOKEN`. The WeChat
+Markdown's "完整版" link points to
 `zju-eclab.github.io/journal/#/issue/<label>`.
 
 ## Important Files

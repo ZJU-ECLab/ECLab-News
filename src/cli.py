@@ -13,7 +13,7 @@ from .journals import issns_for_journal
 from .models import Article
 from .processing import process_articles
 from .render import render_markdown
-from .site_export import build_manifest, export_issue_json
+from .site_export import build_manifest, export_issue_json, update_manifest
 from .sources.crossref import collect_crossref
 from .sources.pubmed import collect_pubmed
 from .summarize import summarize_csv
@@ -54,6 +54,10 @@ def main() -> None:
     manifest_parser.add_argument("--issues-dir", required=True)
     manifest_parser.add_argument("--output", required=True)
 
+    manifest_update_parser = _base_parser(subparsers, "manifest-update")
+    manifest_update_parser.add_argument("--issue", required=True)
+    manifest_update_parser.add_argument("--manifest", required=True)
+
     all_parser = _base_parser(subparsers, "all")
     all_parser.add_argument("--start", required=True)
     all_parser.add_argument("--end", required=True)
@@ -91,6 +95,10 @@ def main() -> None:
     elif args.command == "manifest":
         manifest = build_manifest(args.issues_dir, args.output)
         print(f"Wrote manifest ({manifest['count']} issues) to {args.output}")
+    elif args.command == "manifest-update":
+        manifest, is_new = update_manifest(args.issue, args.manifest)
+        action = "Added" if is_new else "Updated"
+        print(f"{action} issue; wrote manifest ({manifest['count']} issues) to {args.manifest}")
     elif args.command == "all":
         output_dir = Path(args.output_dir)
         start_date = _parse_date(args.start)
@@ -117,7 +125,6 @@ def main() -> None:
 
 
 def _base_parser(subparsers, name: str):
-    import argparse
     parser = subparsers.add_parser(name)
     parser.add_argument("--config", default="config.toml")
     return parser

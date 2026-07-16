@@ -122,23 +122,74 @@ def build_manifest(issues_dir: str | Path, output_path: str | Path) -> dict[str,
             continue
         if not isinstance(data, dict) or "label" not in data:
             continue
-        rec_count = sum(1 for a in data.get("articles", []) if a.get("recommended"))
-        entries.append(
-            {
-                "label": data.get("label"),
-                "title": data.get("title"),
-                "start": data.get("start"),
-                "end": data.get("end"),
-                "year": data.get("year"),
-                "month": data.get("month"),
-                "accent_color": data.get("accent_color"),
-                "generated_at": data.get("generated_at"),
-                "count": data.get("count", len(data.get("articles", []))),
-                "recommended_count": rec_count,
-                "file": f"issues/{path.name}",
-            }
-        )
+        entries.append(_manifest_entry(data, path.name))
 
+    return _write_manifest(entries, output_path)
+
+
+def update_manifest(
+    issue_path: str | Path,
+    manifest_path: str | Path,
+) -> tuple[dict[str, object], bool]:
+    """Merge one issue into an existing manifest and return (manifest, is_new).
+
+    Publishing only needs to download the lightweight manifest from storage,
+    rather than every historical issue JSON. An existing label is replaced so
+    re-running a date range updates its metadata without creating duplicates.
+    """
+    issue_path = Path(issue_path)
+    manifest_path = Path(manifest_path)
+    try:
+        issue = json.loads(issue_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        raise ValueError(f"Could not read issue JSON: {issue_path}") from exc
+    if not isinstance(issue, dict) or not issue.get("label"):
+        raise ValueError(f"Issue JSON has no label: {issue_path}")
+
+    entries: list[dict[str, object]] = []
+    if manifest_path.exists():
+        try:
+            current = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError) as exc:
+            raise ValueError(f"Could not read manifest JSON: {manifest_path}") from exc
+        if not isinstance(current, dict) or not isinstance(current.get("issues"), list):
+            raise ValueError(f"Invalid manifest JSON: {manifest_path}")
+        entries = [entry for entry in current["issues"] if isinstance(entry, dict)]
+
+    label = issue["label"]
+    is_new = all(entry.get("label") != label for entry in entries)
+    entries = [entry for entry in entries if entry.get("label") != label]
+    entries.append(_manifest_entry(issue, issue_path.name))
+    return _write_manifest(entries, manifest_path), is_new
+
+
+def _manifest_entry(data: dict[str, object], filename: str) -> dict[str, object]:
+    articles = data.get("articles")
+    if not isinstance(articles, list):
+        articles = []
+    rec_count = sum(
+        1 for article in articles
+        if isinstance(article, dict) and article.get("recommended")
+    )
+    return {
+        "label": data.get("label"),
+        "title": data.get("title"),
+        "start": data.get("start"),
+        "end": data.get("end"),
+        "year": data.get("year"),
+        "month": data.get("month"),
+        "accent_color": data.get("accent_color"),
+        "generated_at": data.get("generated_at"),
+        "count": data.get("count", len(articles)),
+        "recommended_count": rec_count,
+        "file": f"issues/{filename}",
+    }
+
+
+def _write_manifest(
+    entries: list[dict[str, object]],
+    output_path: str | Path,
+) -> dict[str, object]:
     entries.sort(key=_sort_key, reverse=True)
 
     manifest = {

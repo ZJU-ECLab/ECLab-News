@@ -14,6 +14,13 @@ on:
         required: false
 permissions:
   contents: write
+env:
+  CLOUDBASE_ENV_ID: eclab-progress-d9gm1x6ro276d951a
+  JOURNAL_DATA_PREFIX: journal/v1
+  JOURNAL_DATA_BASE: https://6563-eclab-progress-d9gm1x6ro276d951a-1341393791.tcb.qcloud.la/journal/v1
+concurrency:
+  group: eclab-news-publish
+  cancel-in-progress: false
 jobs:
   generate:
     runs-on: ubuntu-latest
@@ -49,9 +56,11 @@ jobs:
             START=$(date -u -d "last monday -7 days" +%Y-%m-%d)
             END=$(date -u -d "last monday -1 day" +%Y-%m-%d)
           fi
-          echo "start=$START" >> "$GITHUB_OUTPUT"
-          echo "end=$END"     >> "$GITHUB_OUTPUT"
-          echo "label=${START}_${END}" >> "$GITHUB_OUTPUT"
+          {
+            echo "start=$START"
+            echo "end=$END"
+            echo "label=${START}_${END}"
+          } >> "$GITHUB_OUTPUT"
       - name: Resolve release tag
         if: github.event_name != 'release'
         id: tag
@@ -89,40 +98,105 @@ jobs:
             --start "${{ steps.dates.outputs.start }}" \
             --end   "${{ steps.dates.outputs.end }}" \
             --output-dir .
-      - name: Publish issue to website repo
+      - name: Authenticate CloudBase
         env:
-          SITE_DEPLOY_TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+          CLOUDBASE_API_KEY: ${{ secrets.CLOUDBASE_API_KEY }}
         run: |
+          set -euo pipefail
+          if [[ -z "$CLOUDBASE_API_KEY" ]]; then
+            echo "::error::CLOUDBASE_API_KEY is not configured."
+            exit 1
+          fi
+          npx --yes @cloudbase/cli@3.5.9 login \
+            --cloudbase-api-key "$CLOUDBASE_API_KEY" \
+            --env-id "$CLOUDBASE_ENV_ID"
+
+      - name: Publish issue to CloudBase
+        id: publish
+        run: |
+          set -euo pipefail
           LABEL="${{ steps.dates.outputs.label }}"
           ISSUE_JSON="site/issues/${LABEL}.json"
           if [[ ! -f "$ISSUE_JSON" ]]; then
-            echo "No issue JSON produced at $ISSUE_JSON; skipping site publish."
-            exit 0
+            echo "::error::No issue JSON produced at $ISSUE_JSON."
+            exit 1
           fi
-          if [[ -z "$SITE_DEPLOY_TOKEN" ]]; then
-            echo "SITE_DEPLOY_TOKEN not set; skipping site publish."
-            exit 0
-          fi
-          git clone --depth 1 \
-            "https://x-access-token:${SITE_DEPLOY_TOKEN}@github.com/ZJU-ECLab/ZJU-ECLab.github.io.git" \
-            site-repo
-          mkdir -p site-repo/journal/data/issues
-          cp "$ISSUE_JSON" "site-repo/journal/data/issues/${LABEL}.json"
-          # Rebuild the manifest from all issue files now present in the site repo
-          eclab-news manifest \
+
+          mkdir -p cloud-journal
+          npx --yes @cloudbase/cli@3.5.9 storage download \
+            "$JOURNAL_DATA_PREFIX/manifest.json" \
+            cloud-journal/manifest.json \
+            --env-id "$CLOUDBASE_ENV_ID"
+          UPDATE_OUTPUT=$(eclab-news manifest-update \
             --config config.toml \
-            --issues-dir site-repo/journal/data/issues \
-            --output site-repo/journal/data/manifest.json
-          cd site-repo
-          git config user.name "eclab-news-bot"
-          git config user.email "eclab-news-bot@users.noreply.github.com"
-          git add journal/data/issues/"${LABEL}".json journal/data/manifest.json
-          if git diff --cached --quiet; then
-            echo "No changes to publish."
+            --issue "$ISSUE_JSON" \
+            --manifest cloud-journal/manifest.json)
+          echo "$UPDATE_OUTPUT"
+          if [[ "$UPDATE_OUTPUT" == Added* ]]; then
+            IS_NEW=true
           else
-            git commit -m "Publish issue ${LABEL//_/ – }"
-            git push
+            IS_NEW=false
           fi
+
+          # Upload the issue first; the manifest is the atomic publication pointer.
+          npx --yes @cloudbase/cli@3.5.9 storage upload \
+            "$ISSUE_JSON" "$JOURNAL_DATA_PREFIX/issues/${LABEL}.json" \
+            --env-id "$CLOUDBASE_ENV_ID" --times 3
+          npx --yes @cloudbase/cli@3.5.9 storage upload \
+            cloud-journal/manifest.json "$JOURNAL_DATA_PREFIX/manifest.json" \
+            --env-id "$CLOUDBASE_ENV_ID" --times 3
+
+          # Announcements are gated on the actual production URLs, not merely
+          # successful upload commands.
+          READY=false
+          for ATTEMPT in $(seq 1 12); do
+            CACHE_BUSTER="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${ATTEMPT}"
+            if curl --fail --silent --show-error --retry 2 \
+                 "https://emotion.is-cool.dev/journal/" >/dev/null && \
+               curl --fail --silent --show-error --retry 2 \
+                 "https://emotion.is-cool.dev/assets/app.js?publish=${CACHE_BUSTER}" \
+                 --output "$RUNNER_TEMP/live-app.js" && \
+               grep --fixed-strings --quiet \
+                 "$JOURNAL_DATA_BASE/" "$RUNNER_TEMP/live-app.js" && \
+               curl --fail --silent --show-error --retry 2 \
+                 -H "Cache-Control: no-cache" \
+                 "$JOURNAL_DATA_BASE/issues/${LABEL}.json?publish=${CACHE_BUSTER}" \
+                 --output "$RUNNER_TEMP/live-issue.json" && \
+               curl --fail --silent --show-error --retry 2 \
+                 -H "Cache-Control: no-cache" \
+                 "$JOURNAL_DATA_BASE/manifest.json?publish=${CACHE_BUSTER}" \
+                 --output "$RUNNER_TEMP/live-manifest.json"; then
+              if python3 - "$RUNNER_TEMP/live-issue.json" \
+                "$RUNNER_TEMP/live-manifest.json" "$LABEL" <<'PY'
+          import json
+          import sys
+
+          issue_path, manifest_path, expected_label = sys.argv[1:]
+          with open(issue_path, encoding="utf-8") as f:
+              issue = json.load(f)
+          with open(manifest_path, encoding="utf-8") as f:
+              manifest = json.load(f)
+          if issue.get("label") != expected_label:
+              raise SystemExit(1)
+          labels = {entry.get("label") for entry in manifest.get("issues", [])}
+          if expected_label not in labels:
+              raise SystemExit(1)
+          PY
+              then
+                READY=true
+                break
+              fi
+            fi
+            echo "Publication is not visible yet (attempt $ATTEMPT/12)."
+            sleep 10
+          done
+          if [[ "$READY" != "true" ]]; then
+            echo "::error::Issue did not become publicly readable after publication."
+            exit 1
+          fi
+
+          echo "is_new=$IS_NEW" >> "$GITHUB_OUTPUT"
+          echo "label=$LABEL" >> "$GITHUB_OUTPUT"
       - name: Upload release assets and publish
         if: github.event_name == 'release'
         env:
@@ -131,6 +205,8 @@ jobs:
           TAG="${{ github.event.release.tag_name }}"
           gh release upload "$TAG" \
             reports/*_wechat.md \
+            site/issues/*.json \
+            cloud-journal/manifest.json \
             --clobber
           gh release edit "$TAG" --draft=false
       - name: Create release (schedule/dispatch)
@@ -144,6 +220,8 @@ jobs:
             --title "ECLab News ${LABEL//_/-}" \
             --generate-notes \
             reports/*_wechat.md \
+            site/issues/*.json \
+            cloud-journal/manifest.json \
             data/*.csv
       - name: Upload wechat markdown
         if: github.event_name != 'release'
@@ -159,3 +237,27 @@ jobs:
           path: |
             reports/*_wechat.md
             data/*.csv
+            site/issues/*.json
+            cloud-journal/manifest.json
+      - name: Announce newly published issue
+        if: steps.publish.outputs.is_new == 'true'
+        env:
+          SITE_DEPLOY_TOKEN: ${{ secrets.SITE_DEPLOY_TOKEN }}
+          LABEL: ${{ steps.publish.outputs.label }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$SITE_DEPLOY_TOKEN" ]]; then
+            echo "::error::SITE_DEPLOY_TOKEN is required to dispatch the announcement."
+            exit 1
+          fi
+          PAYLOAD=$(jq -n \
+            --arg event_type "journal_issue_published" \
+            --arg label "$LABEL" \
+            '{event_type: $event_type, client_payload: {label: $label}}')
+          curl --fail --silent --show-error \
+            --request POST \
+            --header "Accept: application/vnd.github+json" \
+            --header "Authorization: Bearer $SITE_DEPLOY_TOKEN" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/ZJU-ECLab/ZJU-ECLab.github.io/dispatches \
+            --data "$PAYLOAD"

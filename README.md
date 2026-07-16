@@ -49,18 +49,23 @@ uv run eclab-news manifest --config config.toml --issues-dir site/issues --outpu
 公开网站是独立仓库 `ZJU-ECLab/ZJU-ECLab.github.io`，组织默认 Pages 站点，
 地址 <https://zju-eclab.github.io>。它是数据驱动的单页应用：所有期刊共用同一套
 模板（`index.html` + `assets/app.js` + `assets/style.css`），**不为每期生成 HTML**。
-每期只是一个 `journal/data/issues/<期次>.json`，`journal/data/manifest.json` 列出全部期刊。
+公开 JSON 由 CloudBase 对象存储提供：
 
-**推送流程**：CI 把 `site/issues/*.json` 准备好后，
-克隆网站仓库，把新一期 JSON 复制进 `journal/data/issues/`，用 `eclab-news manifest`
-重建 `manifest.json` 后推送。
+- `journal/v1/issues/<期次>.json`：单期完整内容
+- `journal/v1/manifest.json`：首页使用的轻量期次索引
+
+**发布流程**：CI 下载现有的轻量 manifest，将新一期元数据合并进去，先上传
+issue JSON，再上传 manifest。只有当网站、issue 和 manifest 都能从生产地址读取后，
+才向网站仓库发送事件，由网站仓库发布 Discussion 和钉钉通知。
 
 ## GitHub Actions
 
 添加仓库 Secrets：
 
 - `LLM_API_KEY`、`LLM_API_BASE`（必需），可选 `LLM_MODEL`、`NCBI_API_KEY`、`S2_API_KEY`、`SCOPUS_API_KEY`
+- `CLOUDBASE_API_KEY`：CloudBase 环境的发布密钥，用于上传 issue 和 manifest。
 - `SITE_DEPLOY_TOKEN`：对 `ZJU-ECLab.github.io` 具有 `contents:write` 权限的
-  细粒度 Personal Access Token，用于将每期 JSON 推送到网站仓库。未设置时跳过网站发布。
+  细粒度 Personal Access Token，仅用于在发布验证成功后发送 announcement dispatch。
 
-发布 Release 或手动触发 workflow 时，自动运行全流程、上传报告，并将新一期推送到网站仓库。
+发布 Release 或手动触发 workflow 时，自动运行全流程、上传报告、发布 CloudBase
+数据，并在生产验证成功后通知读者。JSON 同时保存为 Release/Actions 归档。
