@@ -155,7 +155,7 @@ jobs:
           print("CloudBase server API-key exchange succeeded.")
           PY
 
-          npx --yes @cloudbase/cli@3.5.9 login \
+          npx --yes --package @cloudbase/cli@3.5.9 tcb login \
             --cloudbase-api-key "$CLOUDBASE_API_KEY" \
             --env-id "$CLOUDBASE_ENV_ID" \
             --region ap-shanghai
@@ -172,7 +172,7 @@ jobs:
           fi
 
           mkdir -p cloud-journal
-          npx --yes @cloudbase/cli@3.5.9 storage download \
+          npx --yes --package @cloudbase/cli@3.5.9 tcb storage download \
             "$JOURNAL_DATA_PREFIX/manifest.json" \
             cloud-journal/manifest.json \
             --env-id "$CLOUDBASE_ENV_ID"
@@ -188,10 +188,10 @@ jobs:
           fi
 
           # Upload the issue first; the manifest is the atomic publication pointer.
-          npx --yes @cloudbase/cli@3.5.9 storage upload \
+          npx --yes --package @cloudbase/cli@3.5.9 tcb storage upload \
             "$ISSUE_JSON" "$JOURNAL_DATA_PREFIX/issues/${LABEL}.json" \
             --env-id "$CLOUDBASE_ENV_ID" --times 3
-          npx --yes @cloudbase/cli@3.5.9 storage upload \
+          npx --yes --package @cloudbase/cli@3.5.9 tcb storage upload \
             cloud-journal/manifest.json "$JOURNAL_DATA_PREFIX/manifest.json" \
             --env-id "$CLOUDBASE_ENV_ID" --times 3
 
