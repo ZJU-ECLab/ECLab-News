@@ -201,9 +201,9 @@ jobs:
           for ATTEMPT in $(seq 1 12); do
             CACHE_BUSTER="${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}-${ATTEMPT}"
             if curl --fail --silent --show-error --retry 2 \
-                 "https://emotion.is-cool.dev/journal/" >/dev/null && \
+                 "https://zju-eclab.github.io/journal/" >/dev/null && \
                curl --fail --silent --show-error --retry 2 \
-                 "https://emotion.is-cool.dev/assets/app.js?publish=${CACHE_BUSTER}" \
+                 "https://zju-eclab.github.io/assets/app.js?publish=${CACHE_BUSTER}" \
                  --output "$RUNNER_TEMP/live-app.js" && \
                grep --fixed-strings --quiet \
                  "$JOURNAL_DATA_BASE/" "$RUNNER_TEMP/live-app.js" && \
