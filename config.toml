@@ -136,7 +136,7 @@ Personality = ["personality", "trait"]
 
 [llm]
 provider = "litellm"
-model = "xiaomi_mimo/mimo-v2.6"
+model = "xiaomi_mimo/mimo-v2.6-flash"
 temperature = 0.2
 api_key_env = "LLM_API_KEY"
 api_base_env = "LLM_API_BASE"
