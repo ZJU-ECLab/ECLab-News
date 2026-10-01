@@ -1,7 +1,7 @@
 name: Generate ECLab News
 on:
   schedule:
-    - cron: "0 2 * * 2" # Tuesday 02:00 UTC (10:00 UTC+8)
+    - cron: "7 2 * * 2"
   release:
     types: [created]
   workflow_dispatch:
@@ -159,7 +159,6 @@ jobs:
             --cloudbase-api-key "$CLOUDBASE_API_KEY" \
             --env-id "$CLOUDBASE_ENV_ID" \
             --region ap-shanghai
-
       - name: Publish issue to CloudBase
         id: publish
         run: |
